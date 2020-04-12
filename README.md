@@ -49,7 +49,7 @@ matchNonEmpty (Cons h t) =
 
 **With this library:**
 
-```
+```elm
 matchNonEmpty : NonEmptyList a -> foo
 matchNonEmpty (h, t) =
     .....
