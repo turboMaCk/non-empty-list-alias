@@ -32,3 +32,38 @@ One of the areas where downside of current approaches is already noticeable is w
 * [yotamDvir/elm-pivot](https://package.elm-lang.org/packages/yotamDvir/elm-pivot/latest/Pivot)
 
 All of which are usually constructed using `List a -> Maybe (Zipper a)` instead of `NonEmpty a -> Zipper a`.
+My favorite implementation of zipper which doesn't rely on `NonEmpty` is [zwilias/elm-holey-zipper](https://package.elm-lang.org/packages/zwilias/elm-holey-zipper/latest).
+
+### Drawbacks
+
+Compare to other implementations this implementation has not descriptive constructor in value space.
+This means that in pattern matching happens on pair instead of explicit constructor.
+
+**conventional library:**
+
+```elm
+matchNonEmpty : NonEmptyList a -> foo
+matchNonEmpty (NonEmptyList h t) =
+    .....
+```
+
+**With this library:**
+
+```
+matchNonEmpty : NonEmptyList a -> foo
+matchNonEmpty (h, t) =
+    .....
+```
+
+## For Haskell Fanbois
+
+NonEmptyList is:
+
+* [x] functor
+* [ ] applicative
+* [ ] monad
+
+List.NoneEmpty.Zipper is:
+
+* [ ] functor
+* [ ] comonad

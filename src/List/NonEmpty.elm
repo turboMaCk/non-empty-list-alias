@@ -32,6 +32,19 @@ fromList xs =
             Nothing
 
 
+{-| Cons element onto `List` to create `NoneEmptylist`
+
+    fromCons 0 [ 1, 2 ]
+    --> (0, [1, 2])
+
+This function is just an alias on `Tuple.pair`
+
+-}
+fromCons : a -> List a -> NonEmptyList a
+fromCons =
+    Tuple.pair
+
+
 {-| Converts NonEmptyList to List
 
     toList ( 1, [ 2 ] ) --> [1, 2]
@@ -40,6 +53,7 @@ fromList xs =
 toList : NonEmptyList a -> List a
 toList ( h, t ) =
     h :: t
+
 
 
 cons : a -> NonEmptyList a -> NonEmptyList a
