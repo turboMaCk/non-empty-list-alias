@@ -1,4 +1,61 @@
-module List.NonEmpty exposing (..)
+module List.NonEmpty exposing
+    ( NonEmptyList
+    , singleton, cons, fromList, fromCons
+    , map, indexedMap, foldl, foldr, filter, filterMap
+    , length, reverse, all, any, maximum, minimum, product
+    , append, concat, concatMap, intersperse, map2, andMap
+    , sort, sortBy, sortWith
+    , isSingleton, head, tail, uncons
+    , duplicate, extend
+    , decodeList, decode
+    , dropHead, last, member, sum, toList
+    )
+
+{-|
+
+@docs NonEmptyList
+
+
+# Create
+
+@docs singleton, cons, fromList, fromCons
+
+
+# Transform
+
+@docs map, indexedMap, foldl, foldr, filter, filterMap
+
+
+# Utilities
+
+@docs length, reverse, member, all, any, maximum, minimum, sum, product, last
+
+
+# Combine
+
+@docs append, concat, concatMap, intersperse, map2, andMap
+
+
+# Sort
+
+@docs sort, sortBy, sortWith
+
+
+# Deconstruct
+
+@docs isSingleton, head, tail, dropHead, uncons, toList
+
+
+# Extend
+
+@docs duplicate, extend
+
+
+# JSON
+
+@docs decodeList, decode
+
+-}
 
 import Json.Decode as Decode exposing (Decoder)
 
