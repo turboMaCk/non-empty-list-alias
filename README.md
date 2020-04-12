@@ -1,5 +1,7 @@
 # List.NonEmpty alias with Zipper
 
+[![Build Status](https://travis-ci.org/turboMaCk/nonempty-list-alias-with-zipper.svg?branch=master)](https://travis-ci.org/turboMaCk/nonempty-list-alias-with-zipper)
+
 **Work in progress**
 
 Functions for `NonEmptyList` you already have and `Zipper` implementation that goes with it.
@@ -49,7 +51,7 @@ matchNonEmpty (Cons h t) =
 
 **With this library:**
 
-```
+```elm
 matchNonEmpty : NonEmptyList a -> foo
 matchNonEmpty (h, t) =
     .....
