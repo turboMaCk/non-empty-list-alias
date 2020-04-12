@@ -1,1 +1,2 @@
 language: elm
+script: elm-format --validate . && elm-verify-examples && elm-test
