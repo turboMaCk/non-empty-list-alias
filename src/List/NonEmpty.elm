@@ -3,6 +3,9 @@ module List.NonEmpty exposing (..)
 import Json.Decode as Decode exposing (Decoder)
 
 
+{-| NonEmptyList represented
+by alias on a pair of `a` and `List a`.
+-}
 type alias NonEmptyList a =
     ( a, List a )
 
@@ -204,6 +207,15 @@ filterMap f =
 --
 
 
+{-| Calculate leght of `NonEmptyList`
+
+    length ( 1, [ 2, 3 ] )
+    --> 3
+
+    length ( 1, [] )
+    --> 1
+
+-}
 length : NonEmptyList a -> Int
 length ( _, t ) =
     List.length t + 1
@@ -583,13 +595,12 @@ decodeListHelper xs =
 
     JD.decodeString strings "{}"
     --> Err <| JD.Failure "Expecting a LIST" <| JE.object []
+
 -}
 decodeList : Decoder a -> Decoder (NonEmptyList a)
 decodeList decoder =
     Decode.list decoder
         |> Decode.andThen decodeListHelper
-
-
 
 
 {-| Helper for creating custom `Decoder`
@@ -608,7 +619,7 @@ decodeList decoder =
 
 
     JD.decodeString objectDecoder "{\"head\":1,\"tail\":[2,3]}"
-    --> Ok (1, [2,3])
+    --> Ok (1, [ 2, 3 ])
 
     JD.decodeString objectDecoder "{\"head\":true}"
     --> Err <| JD.Failure "Expecting an OBJECT with a field named `tail`" <| JE.object [ ("head", JE.bool True) ]
@@ -628,6 +639,7 @@ decodeList decoder =
 
     JD.decodeString nestedArrayDecoder "[false]"
     --> Err <| JD.Failure "Expecting a LONGER array. Need index 1 but only see 1 entries" <| JE.list JE.bool [False]
+
 -}
 decode : Decoder (a -> List a -> NonEmptyList a)
 decode =
