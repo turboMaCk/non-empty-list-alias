@@ -173,20 +173,85 @@ product : NonEmptyList number -> number
 product =
     List.product << toList
 
+-- append ("1", ["2, 3"]) ("4", ["5"])
+append : NonEmptyList a -> NonEmptyList a -> NonEmptyList a
+append (h1, t1) (h2, t2) =
+    case h2 :: t2 of
+        [] ->
+            (h1, t1)
+        _ ->
+            foldr cons (h2, t2) (h1, t1)
 
 
---
--- append
--- concat
--- concatMap
--- intersperse
--- map2
--- andMap
---
--- sort
--- sortBy
--- sortWith
--- isSingleton
+-- concat (("1", ["2", "3"]), [("4", ["5", "6"]), ("7", ["8"]), ("9", []), ("10", ["11"])])
+concat : NonEmptyList (NonEmptyList a) -> NonEmptyList a
+concat (h, t) =
+    let
+        hx = head h
+        tx = tail h ++ List.concat (List.map toList t)
+    in
+    (hx, tx)
+
+
+-- concatMap (\x -> x) (("1", ["2", "3"]), [("4", ["5", "6"]), ("7", ["8"]), ("9", []), ("10", ["11"])])
+-- concatMap (\x -> (x, [x+1])) (1, [2])
+-- concatMap (\x -> (x+1, [x+1])) (1, [2])
+concatMap : (a -> NonEmptyList b) -> NonEmptyList a -> NonEmptyList b
+concatMap f l =
+    concat (map f l)
+
+-- intersperse "and" ("1", ["2", "3"])
+-- intersperse "and" ("1", ["2"])
+-- intersperse "and" ("1", [])
+intersperse : a -> NonEmptyList a -> NonEmptyList a
+intersperse x l =
+    case l of
+        (_, []) ->
+            l
+        (h, t) ->
+           (h, x :: List.intersperse x t)
+
+-- map2 (+) (1, [2]) (1, [1])
+-- map2 (+) (1, []) (1, [1])
+-- map2 (+) (1, [1]) (1, [])
+map2 : (a -> b -> c) -> NonEmptyList a -> NonEmptyList b -> NonEmptyList c
+map2 f (h1, t1) (h2, t2) =
+    (f h1 h2, List.map2 f t1 t2 )
+
+-- map (+) (1, [2]) |> andMap (1, [1])
+andMap : NonEmptyList a -> NonEmptyList (a -> b) -> NonEmptyList b
+andMap =
+    map2 (|>)
+
+sortHelper : (List a -> List a) -> a -> List a -> NonEmptyList a
+sortHelper f h t =
+    case f (h :: t) of
+        h1 :: t1 ->
+            (h1, t1)
+        [] ->
+            -- impossible state
+            (h, t)
+
+-- sort (3, [4, 1, 2])
+sort : NonEmptyList comparable -> NonEmptyList comparable
+sort (h, t) =
+   sortHelper List.sort h t
+
+-- sortBy String.length ("333", ["4444", "1", "22"])
+sortBy : (a -> comparable) -> NonEmptyList a -> NonEmptyList a
+sortBy f (h, t) =
+    sortHelper (List.sortBy f) h t
+
+sortWith : (a -> a -> Order) -> NonEmptyList a -> NonEmptyList a
+sortWith f (h, t) =
+    sortHelper (List.sortWith f) h t
+
+-- isSingleton ("1", [])
+-- isSingleton ("1", ["2"])
+isSingleton : NonEmptyList a -> Bool
+isSingleton (_, t) =
+    List.isEmpty t
+
 -- take?
 -- drop?
 -- partition?
