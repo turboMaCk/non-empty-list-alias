@@ -35,13 +35,13 @@ fromCons a =
 
 
 toNonEmpty : Zipper a -> NonEmptyList a
-toNonEmpty (Zipper { prev, focus, next }) =
-    case List.reverse prev of
+toNonEmpty (Zipper r) =
+    case List.reverse r.prev of
         [] ->
-            ( focus, next )
+            ( r.focus, r.next )
 
         h :: _ ->
-            ( h, focus :: next )
+            ( h, r.focus :: r.next )
 
 
 toList : Zipper a -> List a
@@ -59,18 +59,18 @@ current (Zipper { focus }) =
 
 
 listNext : Zipper a -> List a
-listNext (Zipper { next }) =
-    next
+listNext (Zipper r) =
+    r.next
 
 
 listPrev : Zipper a -> List a
-listPrev (Zipper { prev }) =
-    List.reverse prev
+listPrev (Zipper r) =
+    List.reverse r.prev
 
 
 hasNext : Zipper a -> Bool
-hasNext (Zipper { next }) =
-    case next of
+hasNext (Zipper r) =
+    case r.next of
         [] ->
             False
 
@@ -79,8 +79,8 @@ hasNext (Zipper { next }) =
 
 
 hasPrev : Zipper a -> Bool
-hasPrev (Zipper { prev }) =
-    case prev of
+hasPrev (Zipper r) =
+    case r.prev of
         [] ->
             False
 
@@ -89,8 +89,38 @@ hasPrev (Zipper { prev }) =
 
 
 length : Zipper a -> Int
-length (Zipper { prev, next }) =
-    List.length prev + List.lengt next + 1
+length (Zipper r) =
+    List.length r.prev + List.length r.next + 1
+
+
+next : Zipper a -> Maybe (Zipper a)
+next (Zipper r) =
+    case r.next of
+        [] ->
+            Nothing
+
+        h :: t ->
+            Just <| Zipper { prev = r.focus :: r.prev, focus = h, next = t }
+
+
+prev : Zipper a -> Maybe (Zipper a)
+prev (Zipper r) =
+    case r.prev of
+        [] ->
+            Nothing
+
+        h :: t ->
+            Just <| Zipper { prev = t, focus = h, next = r.focus :: r.next }
+
+
+attemptNext : Zipper a -> Zipper a
+attemptNext zipper =
+    Maybe.withDefault zipper <| next zipper
+
+
+attemptPrev : Zipper a -> Zipper a
+attemptPrev zipper =
+    Maybe.withDefault zipper <| prev zipper
 
 
 

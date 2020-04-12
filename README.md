@@ -62,6 +62,7 @@ NonEmptyList is:
 * [x] functor
 * [ ] applicative
 * [ ] monad
+* [ ] comonad
 
 List.NoneEmpty.Zipper is:
 
