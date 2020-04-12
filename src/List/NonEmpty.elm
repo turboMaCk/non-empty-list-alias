@@ -1,6 +1,67 @@
-module List.NonEmpty exposing (..)
+module List.NonEmpty exposing
+    ( NonEmptyList
+    , singleton, cons, fromList, fromCons
+    , map, indexedMap, foldl, foldr, filter, filterMap
+    , length, reverse, member, all, any, maximum, minimum, sum, product, last
+    , append, concat, concatMap, intersperse, map2, andMap
+    , sort, sortBy, sortWith
+    , isSingleton, head, tail, dropHead, uncons, toList
+    , duplicate, extend
+    , decodeList, decode
+    )
+
+{-|
+
+@docs NonEmptyList
 
 
+# Create
+
+@docs singleton, cons, fromList, fromCons
+
+
+# Transform
+
+@docs map, indexedMap, foldl, foldr, filter, filterMap
+
+
+# Utilities
+
+@docs length, reverse, member, all, any, maximum, minimum, sum, product, last
+
+
+# Combine
+
+@docs append, concat, concatMap, intersperse, map2, andMap
+
+
+# Sort
+
+@docs sort, sortBy, sortWith
+
+
+# Deconstruct
+
+@docs isSingleton, head, tail, dropHead, uncons, toList
+
+
+# Expand
+
+@docs duplicate, extend
+
+
+# JSON
+
+@docs decodeList, decode
+
+-}
+
+import Json.Decode as Decode exposing (Decoder)
+
+
+{-| NonEmptyList represented
+by alias on a pair of `a` and `List a`.
+-}
 type alias NonEmptyList a =
     ( a, List a )
 
@@ -73,10 +134,10 @@ cons a ( h, t ) =
 {-| Remove first element form `NonEmptylist`.
 
     uncons ( 3, [ 2, 1 ] )
-    -> ( 3, Just ( 2, [ 1 ] ) )
+    --> ( 3, Just ( 2, [ 1 ] ) )
 
     uncons ( "hello!", [] )
-    -> ( "hello", Nothing )
+    --> ( "hello!", Nothing )
 
 -}
 uncons : NonEmptyList a -> ( a, Maybe (NonEmptyList a) )
@@ -114,6 +175,8 @@ tail ( _, t ) =
 
     last ( 1, [] )
     --> 1
+
+This function is _O(n)_
 
 -}
 last : NonEmptyList a -> a
@@ -178,21 +241,57 @@ indexedMap f ( h, t ) =
     ( f 0 h, List.indexedMap (\i -> f (i + 1)) t )
 
 
+{-| Reduce `NonEmptyList` from left
+
+    foldl (+) 0 (1, [2,3,4])
+    --> 10
+
+    foldl cons (0, []) (1, [2,3,4])
+    --> (4, [3,2,1,0])
+
+-}
 foldl : (a -> b -> b) -> b -> NonEmptyList a -> b
 foldl f acc =
     List.foldl f acc << toList
 
 
+{-| Reduce `NonEmptyList` from right
+
+    foldr (+) 0 (1, [2,3,4])
+    --> 10
+
+    foldr cons (5, []) (1, [2,3,4])
+    --> (1, [2, 3, 4, 5])
+
+-}
 foldr : (a -> b -> b) -> b -> NonEmptyList a -> b
 foldr f acc =
     List.foldr f acc << toList
 
 
+{-| Keep elements that satisfy the test
+
+    isEven : Int -> Bool
+    isEven n = (n |> modBy 2) == 0
+
+    filter isEven (1,[2,3,4,5])
+    --> Just (2, [4] )
+
+-}
 filter : (a -> Bool) -> NonEmptyList a -> Maybe (NonEmptyList a)
 filter f =
     fromList << List.filter f << toList
 
 
+{-| Filter out value that resolve to `Nothing`
+
+    filterMap String.toInt ("1", ["baz", "3rd", "4"])
+    --> Just (1, [4])
+
+    filterMap String.toInt ("foo", ["baz", "3rd"])
+    --> Nothing
+
+-}
 filterMap : (a -> Maybe b) -> NonEmptyList a -> Maybe (NonEmptyList b)
 filterMap f =
     fromList << List.filterMap f << toList
@@ -202,11 +301,26 @@ filterMap f =
 --
 
 
+{-| Calculate leght of `NonEmptyList`
+
+    length ( 1, [ 2, 3 ] )
+    --> 3
+
+    length ( 1, [] )
+    --> 1
+
+-}
 length : NonEmptyList a -> Int
 length ( _, t ) =
     List.length t + 1
 
 
+{-| Reverse `NonEmptyList`
+
+    reverse (1, [2, 3, 4])
+    --> (4, [3, 2, 1])
+
+-}
 reverse : NonEmptyList a -> NonEmptyList a
 reverse ( h, t ) =
     case List.reverse <| h :: t of
@@ -487,8 +601,6 @@ andMap =
     map2 (|>)
 
 
-{-| unexposed sorting helper
--}
 sortHelper : (List a -> List a) -> ( a, List a ) -> NonEmptyList a
 sortHelper f ne =
     case f <| toList ne of
@@ -551,3 +663,81 @@ isSingleton ( _, t ) =
    * partition?
    * unzip?
 -}
+-- JSON functions
+
+
+decodeListHelper : List a -> Decoder (NonEmptyList a)
+decodeListHelper xs =
+    case fromList xs of
+        Just res ->
+            Decode.succeed res
+
+        Nothing ->
+            Decode.fail "Expecting at least ONE ELEMENT array"
+
+
+{-| Decode JSON array to `NonEmptyList`
+
+    import Json.Decode as JD exposing (Decoder)
+    import Json.Encode as JE
+
+    strings : Decoder (NonEmptyList String)
+    strings =
+        decodeList JD.string
+
+    JD.decodeString strings "[\"foo\",\"bar\",\"baz\"]"
+    --> Ok ( "foo", [ "bar", "baz" ])
+
+    JD.decodeString strings "[]"
+    --> Err <| JD.Failure "Expecting at least ONE ELEMENT array" <| JE.list identity []
+
+    JD.decodeString strings "{}"
+    --> Err <| JD.Failure "Expecting a LIST" <| JE.object []
+
+-}
+decodeList : Decoder a -> Decoder (NonEmptyList a)
+decodeList decoder =
+    Decode.list decoder
+        |> Decode.andThen decodeListHelper
+
+
+{-| Helper for creating custom `Decoder`
+
+    import Json.Decode as JD exposing (Decoder)
+    import Json.Encode as JE
+    import Json.Decode.Extra as JDE
+    import Json.Decode.Pipeline as JDP
+
+    -- Decoding from custom object
+
+    objectDecoder : Decoder (NonEmptyList Int)
+    objectDecoder =
+        decode
+         |> JDP.required "head" JD.int
+         |> JDP.required "tail" (JD.list JD.int)
+
+
+    JD.decodeString objectDecoder "{\"head\":1,\"tail\":[2,3]}"
+    --> Ok (1, [ 2, 3 ])
+
+    JD.decodeString objectDecoder "{\"head\":true}"
+    --> Err <| JD.Failure "Expecting an OBJECT with a field named `tail`" <| JE.object [ ("head", JE.bool True) ]
+
+    -- Decoding from Array of Arrays
+
+    nestedArrayDecoder : Decoder (NonEmptyList Bool)
+    nestedArrayDecoder =
+        decode
+        |> JDE.andMap (JD.index 0 JD.bool)
+        |> JDE.andMap (JD.index 1 <| JD.list JD.bool)
+
+    JD.decodeString nestedArrayDecoder "[true, [false, true]]"
+    --> Ok (True, [False, True])
+
+    JD.decodeString nestedArrayDecoder "[false]"
+    --> Err <| JD.Failure "Expecting a LONGER array. Need index 1 but only see 1 entries" <| JE.list JE.bool [False]
+
+-}
+decode : Decoder (a -> List a -> NonEmptyList a)
+decode =
+    Decode.succeed fromCons
