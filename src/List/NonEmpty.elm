@@ -32,6 +32,19 @@ fromList xs =
             Nothing
 
 
+{-| Cons element onto `List` to create `NoneEmptylist`
+
+    fromCons 0 [ 1, 2 ]
+    --> (0, [1, 2])
+
+This function is just an alias on `Tuple.pair`
+
+-}
+fromCons : a -> List a -> NonEmptyList a
+fromCons =
+    Tuple.pair
+
+
 {-| Converts NonEmptyList to List
 
     toList ( 1, [ 2 ] ) --> [1, 2]
@@ -412,7 +425,10 @@ isSingleton ( _, t ) =
 
 
 
--- take?
--- drop?
--- partition?
--- unzip?
+{- Other function candidates:
+
+   * take?
+   * drop?
+   * partition?
+   * unzip?
+-}
