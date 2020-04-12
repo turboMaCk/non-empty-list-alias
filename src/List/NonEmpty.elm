@@ -179,15 +179,13 @@ product =
 
 
 append : NonEmptyList a -> NonEmptyList a -> NonEmptyList a
-append ( h1, t1 ) ( h2, t2 ) =
-    case h2 :: t2 of
+append ne1 ne2 =
+    case toList ne2 of
         [] ->
-            ( h1, t1 )
+            ne1
 
         _ ->
-            foldr cons ( h2, t2 ) ( h1, t1 )
-
-
+            foldr cons ne1 ne2
 
 -- concat (("1", ["2", "3"]), [("4", ["5", "6"]), ("7", ["8"]), ("9", []), ("10", ["11"])])
 
@@ -211,9 +209,8 @@ concat ( h, t ) =
 
 
 concatMap : (a -> NonEmptyList b) -> NonEmptyList a -> NonEmptyList b
-concatMap f l =
-    concat (map f l)
-
+concatMap f =
+    concat << map f
 
 
 -- intersperse "and" ("1", ["2", "3"])
@@ -222,10 +219,10 @@ concatMap f l =
 
 
 intersperse : a -> NonEmptyList a -> NonEmptyList a
-intersperse x l =
-    case l of
+intersperse x ne=
+    case ne of
         ( _, [] ) ->
-            l
+            ne
 
         ( h, t ) ->
             ( h, x :: List.intersperse x t )
@@ -251,15 +248,15 @@ andMap =
     map2 (|>)
 
 
-sortHelper : (List a -> List a) -> a -> List a -> NonEmptyList a
-sortHelper f h t =
-    case f (h :: t) of
-        h1 :: t1 ->
-            ( h1, t1 )
+sortHelper : (List a -> List a) -> (a, List a) -> NonEmptyList a
+sortHelper f ne =
+    case f <| toList ne of
+        h :: t ->
+            ( h, t )
 
         [] ->
             -- impossible state
-            ( h, t )
+            ne
 
 
 
@@ -267,8 +264,8 @@ sortHelper f h t =
 
 
 sort : NonEmptyList comparable -> NonEmptyList comparable
-sort ( h, t ) =
-    sortHelper List.sort h t
+sort =
+    sortHelper List.sort
 
 
 
@@ -276,19 +273,25 @@ sort ( h, t ) =
 
 
 sortBy : (a -> comparable) -> NonEmptyList a -> NonEmptyList a
-sortBy f ( h, t ) =
-    sortHelper (List.sortBy f) h t
+sortBy f =
+    sortHelper (List.sortBy f)
 
 
 sortWith : (a -> a -> Order) -> NonEmptyList a -> NonEmptyList a
-sortWith f ( h, t ) =
-    sortHelper (List.sortWith f) h t
+sortWith f =
+    sortHelper (List.sortWith f)
 
 
 
 -- isSingleton ("1", [])
 -- isSingleton ("1", ["2"])
 
+{-| is the nonempty list exactly one element?
+
+    isSingleton (1, []) -> True
+    isSingleton (1, [2]) -> False
+
+-}
 
 isSingleton : NonEmptyList a -> Bool
 isSingleton ( _, t ) =
