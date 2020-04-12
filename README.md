@@ -60,6 +60,7 @@ matchNonEmpty (h, t) =
 NonEmptyList is:
 
 * [x] Functor
+* [x] Foldable
 * [x] Applicative
 * [x] Monad
 * [ ] Comonad
@@ -67,4 +68,6 @@ NonEmptyList is:
 List.NonEmpty.Zipper is:
 
 * [ ] Functor
+* [ ] Foldable
+* [ ] Applicative
 * [ ] Comonad
