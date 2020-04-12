@@ -2,13 +2,12 @@ module List.NonEmpty exposing
     ( NonEmptyList
     , singleton, cons, fromList, fromCons
     , map, indexedMap, foldl, foldr, filter, filterMap
-    , length, reverse, all, any, maximum, minimum, product
+    , length, reverse, member, all, any, maximum, minimum, sum, product, last
     , append, concat, concatMap, intersperse, map2, andMap
     , sort, sortBy, sortWith
-    , isSingleton, head, tail, uncons
+    , isSingleton, head, tail, dropHead, uncons, toList
     , duplicate, extend
     , decodeList, decode
-    , dropHead, last, member, sum, toList
     )
 
 {-|
@@ -176,6 +175,8 @@ tail ( _, t ) =
 
     last ( 1, [] )
     --> 1
+
+This function is _O(n)_
 
 -}
 last : NonEmptyList a -> a

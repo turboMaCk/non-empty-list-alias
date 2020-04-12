@@ -3,7 +3,7 @@
     "name": "turboMaCk/non-empty-list-alias",
     "summary": "Non empty",
     "license": "BSD-3-Clause",
-    "version": "1.0.2",
+    "version": "1.0.0",
     "exposed-modules": [
         "List.NonEmpty"
     ],
