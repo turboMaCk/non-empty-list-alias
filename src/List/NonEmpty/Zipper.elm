@@ -151,6 +151,30 @@ byMaybeHelper step n acc =
                 Nothing
 
 
+attemptNextBy : Int -> Zipper a -> Zipper a
+attemptNextBy =
+    attemptByHelper next
+
+
+attemptPrevBy : Int -> Zipper a -> Zipper a
+attemptPrevBy =
+    attemptByHelper prev
+
+
+attemptByHelper : (Zipper a -> Maybe (Zipper a)) -> Int -> Zipper a -> Zipper a
+attemptByHelper step n acc =
+    if n < 1 then
+        acc
+
+    else
+        case step acc of
+            Just newAcc ->
+                attemptByHelper step (n - 1) newAcc
+
+            Nothing ->
+                acc
+
+
 
 -- Cycling
 

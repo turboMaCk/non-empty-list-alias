@@ -74,6 +74,22 @@ movementTest =
                 Zipper.nextBy 1 simpleZipper
                     |> Maybe.andThen (Zipper.prevBy 1)
                     |> Expect.equal (Just simpleZipper)
+        , test "attemptNextBy moves by n" <|
+            \() ->
+                Zipper.attemptNextBy 4 simpleZipper
+                    |> Zipper.current
+                    |> Expect.equal 4
+        , test "attemptNextBy stays on last element if greater than length" <|
+            \() ->
+                Zipper.attemptNextBy 9999 simpleZipper
+                    |> Zipper.current
+                    |> Expect.equal 9
+        , test "attemptPrevBy moves back" <|
+            \() ->
+                Zipper.attemptNextBy 5 simpleZipper
+                    |> Zipper.attemptPrevBy 3
+                    |> Zipper.current
+                    |> Expect.equal 2
         ]
 
 
@@ -98,4 +114,9 @@ cycleTest =
                 Zipper.backward simpleZipper
                     |> Zipper.current
                     |> Expect.equal 9
+
+        -- , test "forwardBy length on first returns to begining" <|
+        --     \() ->
+        --         Zipper.forwardBy (Zipper.length simpleZipper) simpleZipper
+        --             |> Expect.equal simpleZipper
         ]
