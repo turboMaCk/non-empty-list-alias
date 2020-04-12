@@ -43,7 +43,7 @@ This means that in pattern matching happens on pair instead of explicit construc
 
 ```elm
 matchNonEmpty : NonEmptyList a -> foo
-matchNonEmpty (NonEmptyList h t) =
+matchNonEmpty (Cons h t) =
     .....
 ```
 
@@ -59,12 +59,12 @@ matchNonEmpty (h, t) =
 
 NonEmptyList is:
 
-* [x] functor
-* [ ] applicative
-* [ ] monad
-* [ ] comonad
+* [x] Functor
+* [x] Applicative
+* [x] Monad
+* [ ] Comonad
 
 List.NonEmpty.Zipper is:
 
-* [ ] functor
-* [ ] comonad
+* [ ] Functor
+* [ ] Comonad
