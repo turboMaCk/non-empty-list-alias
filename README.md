@@ -65,7 +65,7 @@ NonEmptyList is:
 * [x] Foldable
 * [x] Applicative
 * [x] Monad
-* [ ] Comonad
+* [x] Comonad
 
 List.NonEmpty.Zipper is:
 

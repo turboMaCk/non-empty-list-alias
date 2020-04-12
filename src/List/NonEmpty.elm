@@ -1,5 +1,7 @@
 module List.NonEmpty exposing (..)
 
+import Json.Decode as Decode exposing (Decoder)
+
 
 type alias NonEmptyList a =
     ( a, List a )
@@ -551,3 +553,82 @@ isSingleton ( _, t ) =
    * partition?
    * unzip?
 -}
+-- JSON functions
+
+
+decodeListHelper : List a -> Decoder (NonEmptyList a)
+decodeListHelper xs =
+    case fromList xs of
+        Just res ->
+            Decode.succeed res
+
+        Nothing ->
+            Decode.fail "Expecting at least ONE ELEMENT array"
+
+
+{-| Decode JSON array to `NonEmptyList`
+
+    import Json.Decode as JD exposing (Decoder)
+    import Json.Encode as JE
+
+    strings : Decoder (NonEmptyList String)
+    strings =
+        decodeList JD.string
+
+    JD.decodeString strings "[\"foo\",\"bar\",\"baz\"]"
+    --> Ok ( "foo", [ "bar", "baz" ])
+
+    JD.decodeString strings "[]"
+    --> Err <| JD.Failure "Expecting at least ONE ELEMENT array" <| JE.list identity []
+
+    JD.decodeString strings "{}"
+    --> Err <| JD.Failure "Expecting a LIST" <| JE.object []
+-}
+decodeList : Decoder a -> Decoder (NonEmptyList a)
+decodeList decoder =
+    Decode.list decoder
+        |> Decode.andThen decodeListHelper
+
+
+
+
+{-| Helper for creating custom `Decoder`
+
+    import Json.Decode as JD exposing (Decoder)
+    import Json.Encode as JE
+    import Json.Decode.Pipeline as JDP
+
+    -- Decoding from custom object
+
+    objectDecoder : Decoder (NonEmptyList Int)
+    objectDecoder =
+        decode
+         |> JDP.required "head" JD.int
+         |> JDP.required "tail" (JD.list JD.int)
+
+
+    JD.decodeString objectDecoder "{\"head\":1,\"tail\":[2,3]}"
+    --> Ok (1, [2,3])
+
+    JD.decodeString objectDecoder "{\"head\":true}"
+    --> Err <| JD.Failure "Expecting an OBJECT with a field named `tail`" <| JE.object [ ("head", JE.bool True) ]
+
+    -- Decoding from Array of Arrays
+
+    import Json.Decode.Extra as JDE
+
+    nestedArrayDecoder : Decoder (NonEmptyList Bool)
+    nestedArrayDecoder =
+        decode
+        |> JDE.andMap (JD.index 0 JD.bool)
+        |> JDE.andMap (JD.index 1 <| JD.list JD.bool)
+
+    JD.decodeString nestedArrayDecoder "[true, [false, true]]"
+    --> Ok (True, [False, True])
+
+    JD.decodeString nestedArrayDecoder "[false]"
+    --> Err <| JD.Failure "Expecting a LONGER array. Need index 1 but only see 1 entries" <| JE.list JE.bool [False]
+-}
+decode : Decoder (a -> List a -> NonEmptyList a)
+decode =
+    Decode.succeed fromCons
