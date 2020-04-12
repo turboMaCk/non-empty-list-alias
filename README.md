@@ -1,0 +1,34 @@
+# List.NonEmpty alias with Zipper
+
+**Work in progress**
+
+Functions for `NonEmptyList` you already have and `Zipper` implementation that goes with it.
+
+## Motivation
+
+[elm/core](https://package.elm-lang.org/packages/elm/core/latest/) doesn't come with any sort of `NoneEmptyList` type.
+This means one usually has to reply on one of the user implementations on `NonEmpty` type:
+
+* [mgold/elm-nonempty-list](https://package.elm-lang.org/packages/mgold/elm-nonempty-list/latest/)
+* [hrldcpr/elm-cons](https://package.elm-lang.org/packages/hrldcpr/elm-cons/latest/)
+
+These implementations usually define custom type like `NonEmpty a = NonEmpty a (List a)` and expose the constructor
+to make pattern matching possible. Anyway this makes it hard for library authors to provide
+support for `NonEmpty` because they would need to pick one of these libraries and use it as a dependency
+of their own implementation and essentially impose this decision on their users.
+
+This implementation uses different approach. `NonEmpty` is an alias on the pair `type alias NonEmpty a = (a, List a)`.
+Relaying on anonymous data-type like tuple means:
+
+1. [Libraries](https://package.elm-lang.org/packages/elm-community/list-extra/latest/List-Extra#uncons) can produce `NonEmpty` data without depending on specific implementation
+2. Implementation provided by this package can be easily replaced by other implementation without breaking API due to types.
+
+### Zipper
+
+One of the areas where downside of current approaches is already noticeable is when it comes to Zipper implementation.
+
+* [jjant/elm-comonad-zipper](jjant/elm-comonad-zipper)
+* [wernerdegroot/listzipper](https://package.elm-lang.org/packages/wernerdegroot/listzipper/latest/)
+* [yotamDvir/elm-pivot](https://package.elm-lang.org/packages/yotamDvir/elm-pivot/latest/Pivot)
+
+All of which are usually constructed using `List a -> Maybe (Zipper a)` instead of `NonEmpty a -> Zipper a`.
