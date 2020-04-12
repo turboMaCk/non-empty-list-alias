@@ -47,7 +47,7 @@ movementTest =
                 Zipper.next simpleZipper
                     |> Maybe.map Zipper.current
                     |> Expect.equal (Just 1)
-        , test "attemptNext << attemptPrev is identity" <|
+        , test "attemptPrev << attemptNext is identity" <|
             \() ->
                 Zipper.attemptNext simpleZipper
                     |> Zipper.attemptPrev
@@ -56,6 +56,24 @@ movementTest =
             \() ->
                 Zipper.prev simpleZipper
                     |> Expect.equal Nothing
+        , test "nextBy number lower than size" <|
+            \() ->
+                Zipper.nextBy 5 simpleZipper
+                    |> Maybe.map Zipper.current
+                    |> Expect.equal (Just 5)
+        , test "nextBy more than leght returns Nothing" <|
+            \() ->
+                Zipper.nextBy 10 simpleZipper
+                    |> Expect.equal Nothing
+        , test "prevBy on first should return Nothing" <|
+            \() ->
+                Zipper.prevBy 3 simpleZipper
+                    |> Expect.equal Nothing
+        , test "prevBy 1 =<< nextBy 1 should return original" <|
+            \() ->
+                Zipper.nextBy 1 simpleZipper
+                    |> Maybe.andThen (Zipper.prevBy 1)
+                    |> Expect.equal (Just simpleZipper)
         ]
 
 

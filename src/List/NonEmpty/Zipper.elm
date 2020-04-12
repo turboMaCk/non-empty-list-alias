@@ -127,6 +127,30 @@ attemptPrev zipper =
     Maybe.withDefault zipper <| prev zipper
 
 
+nextBy : Int -> Zipper a -> Maybe (Zipper a)
+nextBy =
+    byMaybeHelper next
+
+
+prevBy : Int -> Zipper a -> Maybe (Zipper a)
+prevBy =
+    byMaybeHelper prev
+
+
+byMaybeHelper : (Zipper a -> Maybe (Zipper a)) -> Int -> Zipper a -> Maybe (Zipper a)
+byMaybeHelper step n acc =
+    if n < 1 then
+        Just acc
+
+    else
+        case step acc of
+            Just newAcc ->
+                byMaybeHelper step (n - 1) newAcc
+
+            Nothing ->
+                Nothing
+
+
 
 -- Cycling
 
