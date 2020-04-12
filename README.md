@@ -6,7 +6,7 @@ Functions for `NonEmptyList` you already have and `Zipper` implementation that g
 
 ## Motivation
 
-[elm/core](https://package.elm-lang.org/packages/elm/core/latest/) doesn't come with any sort of non empty list type.
+[elm/core](https://package.elm-lang.org/packages/elm/core/latest/) doesn't come with any sort of `NoneEmptyList` type.
 This means one usually has to reply on one of the user implementations on `NonEmpty` type:
 
 * [mgold/elm-nonempty-list](https://package.elm-lang.org/packages/mgold/elm-nonempty-list/latest/)
