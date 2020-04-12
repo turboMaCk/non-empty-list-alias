@@ -45,7 +45,7 @@ module List.NonEmpty exposing
 @docs isSingleton, head, tail, dropHead, uncons, toList
 
 
-# Extend
+# Expand
 
 @docs duplicate, extend
 
