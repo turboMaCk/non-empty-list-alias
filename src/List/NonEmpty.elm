@@ -223,7 +223,7 @@ concatMap f =
 
     intersperse "and" ( "1", [ "2" ] ) --> ("1", ["and", "2"])
 
-    intersperse "and" ( "1", [] ) --> ("1")
+    intersperse "and" ( "1", [] ) --> ("1", [])
 
 -}
 intersperse : a -> NonEmptyList a -> NonEmptyList a
