@@ -17,8 +17,8 @@ to make pattern matching possible. Anyway this makes it hard for library authors
 support for `NonEmpty` because they would need to pick one of these libraries and use it as a dependency
 of their own implementation and essentially impose this decision on their users.
 
-This implementation uses different approach. `NonEmpty` is an alias on pair `type NonEmpty a = (a, List a)`.
-Relaying on anonymous data-type like tuple means
+This implementation uses different approach. `NonEmpty` is an alias on the pair `type alias NonEmpty a = (a, List a)`.
+Relaying on anonymous data-type like tuple means:
 
 1. [Libraries](https://package.elm-lang.org/packages/elm-community/list-extra/latest/List-Extra#uncons) can produce `NonEmpty` data without depending on specific implementation
 2. Implementation provided by this package can be easily replaced by other implementation without breaking API due to types.
