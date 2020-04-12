@@ -135,10 +135,10 @@ cons a ( h, t ) =
 {-| Remove first element form `NonEmptylist`.
 
     uncons ( 3, [ 2, 1 ] )
-    -> ( 3, Just ( 2, [ 1 ] ) )
+    --> ( 3, Just ( 2, [ 1 ] ) )
 
     uncons ( "hello!", [] )
-    -> ( "hello", Nothing )
+    --> ( "hello", Nothing )
 
 -}
 uncons : NonEmptyList a -> ( a, Maybe (NonEmptyList a) )
@@ -704,6 +704,7 @@ decodeList decoder =
 
     import Json.Decode as JD exposing (Decoder)
     import Json.Encode as JE
+    import Json.Decode.Extra as JDE
     import Json.Decode.Pipeline as JDP
 
     -- Decoding from custom object
@@ -722,8 +723,6 @@ decodeList decoder =
     --> Err <| JD.Failure "Expecting an OBJECT with a field named `tail`" <| JE.object [ ("head", JE.bool True) ]
 
     -- Decoding from Array of Arrays
-
-    import Json.Decode.Extra as JDE
 
     nestedArrayDecoder : Decoder (NonEmptyList Bool)
     nestedArrayDecoder =
