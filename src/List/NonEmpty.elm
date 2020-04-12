@@ -137,7 +137,7 @@ cons a ( h, t ) =
     --> ( 3, Just ( 2, [ 1 ] ) )
 
     uncons ( "hello!", [] )
-    --> ( "hello", Nothing )
+    --> ( "hello!", Nothing )
 
 -}
 uncons : NonEmptyList a -> ( a, Maybe (NonEmptyList a) )
