@@ -55,7 +55,6 @@ toList ( h, t ) =
     h :: t
 
 
-
 cons : a -> NonEmptyList a -> NonEmptyList a
 cons a ( h, t ) =
     ( a, h :: t )
