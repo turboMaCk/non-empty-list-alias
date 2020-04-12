@@ -183,21 +183,57 @@ indexedMap f ( h, t ) =
     ( f 0 h, List.indexedMap (\i -> f (i + 1)) t )
 
 
+{-| Reduce `NonEmptyList` from left
+
+    foldl (+) 0 (1, [2,3,4])
+    --> 10
+
+    foldl cons (0, []) (1, [2,3,4])
+    --> (4, [3,2,1,0])
+
+-}
 foldl : (a -> b -> b) -> b -> NonEmptyList a -> b
 foldl f acc =
     List.foldl f acc << toList
 
 
+{-| Reduce `NonEmptyList` from right
+
+    foldr (+) 0 (1, [2,3,4])
+    --> 10
+
+    foldr cons (5, []) (1, [2,3,4])
+    --> (1, [2, 3, 4, 5])
+
+-}
 foldr : (a -> b -> b) -> b -> NonEmptyList a -> b
 foldr f acc =
     List.foldr f acc << toList
 
 
+{-| Keep elements that satisfy the test
+
+    isEven : Int -> Bool
+    isEven n = (n |> modBy 2) == 0
+
+    filter isEven (1,[2,3,4,5])
+    --> Just (2, [4] )
+
+-}
 filter : (a -> Bool) -> NonEmptyList a -> Maybe (NonEmptyList a)
 filter f =
     fromList << List.filter f << toList
 
 
+{-| Filter out value that resolve to `Nothing`
+
+    filterMap String.toInt ("1", ["baz", "3rd", "4"])
+    --> Just (1, [4])
+
+    filterMap String.toInt ("foo", ["baz", "3rd"])
+    --> Nothing
+
+-}
 filterMap : (a -> Maybe b) -> NonEmptyList a -> Maybe (NonEmptyList b)
 filterMap f =
     fromList << List.filterMap f << toList
@@ -221,6 +257,12 @@ length ( _, t ) =
     List.length t + 1
 
 
+{-| Reverse `NonEmptyList`
+
+    reverse (1, [2, 3, 4])
+    --> (4, [3, 2, 1])
+
+-}
 reverse : NonEmptyList a -> NonEmptyList a
 reverse ( h, t ) =
     case List.reverse <| h :: t of
@@ -501,8 +543,6 @@ andMap =
     map2 (|>)
 
 
-{-| unexposed sorting helper
--}
 sortHelper : (List a -> List a) -> ( a, List a ) -> NonEmptyList a
 sortHelper f ne =
     case f <| toList ne of
