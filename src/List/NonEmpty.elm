@@ -176,7 +176,7 @@ product =
 
 {-| Put two lists together.
 
-    append (1, [2, 3]) (4, [5]) --> (1, [2, 3, 4, 5])
+    append ( 1, [ 2, 3 ] ) ( 4, [ 5 ] ) --> (1, [2, 3, 4, 5])
 
 -}
 append : NonEmptyList a -> NonEmptyList a -> NonEmptyList a
@@ -190,9 +190,8 @@ append ne1 ne2 =
 
 
 {-| Concatenate a bunch of lists into a single list:
-    concat ((1, [2, 3]), [(4, [5, 6]), (7, [8]), (9, []), (10, [11])])
-    --> (1,[2,3,4,5,6,7,8,9,10,11])
-
+concat ((1, [2, 3]), [(4, [5, 6]), (7, [8]), (9, []), (10, [11])])
+--> (1,[2,3,4,5,6,7,8,9,10,11])
 -}
 concat : NonEmptyList (NonEmptyList a) -> NonEmptyList a
 concat ( h, t ) =
@@ -208,10 +207,9 @@ concat ( h, t ) =
 
 {-| Map a given function onto a list and flatten the resulting lists.
 
+    concatMap singleton ( 1, [ 2 ] ) -->  (1, [2])
 
-    concatMap singleton (1, [2])            -->  (1, [2])
-    concatMap (\x -> (x+1, [x+1])) (1, [2]) --> (2, [2, 3, 3])
-
+    concatMap (\x -> ( x + 1, [ x + 1 ] )) ( 1, [ 2 ] ) --> (2, [2, 3, 3])
 
 -}
 concatMap : (a -> NonEmptyList b) -> NonEmptyList a -> NonEmptyList b
