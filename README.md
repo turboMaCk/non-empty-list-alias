@@ -13,9 +13,9 @@ This means one usually has to reply on one of the user implementations on `NonEm
 * [hrldcpr/elm-cons](https://package.elm-lang.org/packages/hrldcpr/elm-cons/latest/)
 
 These implementations usually define custom type like `NonEmpty a = NonEmpty a (List a)` and expose the constructor
-to make pattern matching possible. Anyway this makes it hard for library and application author to provide
-support for `NonEmpty` because they would need to pick on of those libraries over the other and use it as a dependency
-of their own implementation.
+to make pattern matching possible. Anyway this makes it hard for library authors to provide
+support for `NonEmpty` because they would need to pick one of these libraries and use it as a dependency
+of their own implementation and essentially impose this decision on their users.
 
 This implementation uses different approach. `NonEmpty` is an alias on pair `type NonEmpty a = (a, List a)`.
 Relaying on anonymous data-type like tuple means
