@@ -114,9 +114,18 @@ cycleTest =
                 Zipper.backward simpleZipper
                     |> Zipper.current
                     |> Expect.equal 9
-
-        -- , test "forwardBy length on first returns to begining" <|
-        --     \() ->
-        --         Zipper.forwardBy (Zipper.length simpleZipper) simpleZipper
-        --             |> Expect.equal simpleZipper
+        , test "forwardBy length on first returns to begining" <|
+            \() ->
+                Zipper.forwardBy (Zipper.length simpleZipper) simpleZipper
+                    |> Expect.equal simpleZipper
+        , test "forwardBy should make n steps" <|
+            \() ->
+                Zipper.forwardBy 3 simpleZipper
+                    |> Zipper.current
+                    |> Expect.equal 3
+        , test "backwardBy should make n steps" <|
+            \() ->
+                Zipper.backwardBy 3 simpleZipper
+                    |> Zipper.current
+                    |> Expect.equal 7
         ]

@@ -425,7 +425,10 @@ isSingleton ( _, t ) =
 
 
 
--- take?
--- drop?
--- partition?
--- unzip?
+{- Other function candidates:
+
+   * take?
+   * drop?
+   * partition?
+   * unzip?
+-}

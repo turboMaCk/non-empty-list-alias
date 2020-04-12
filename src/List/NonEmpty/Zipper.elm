@@ -209,3 +209,22 @@ backward (Zipper r) =
 
         h :: t ->
             Zipper { prev = t, focus = h, next = r.focus :: r.next }
+
+
+forwardBy : Int -> Zipper a -> Zipper a
+forwardBy =
+    rewindByHelper forward
+
+
+backwardBy : Int -> Zipper a -> Zipper a
+backwardBy =
+    rewindByHelper backward
+
+
+rewindByHelper : (Zipper a -> Zipper a) -> Int -> Zipper a -> Zipper a
+rewindByHelper step n acc =
+    if n < 1 then
+        acc
+
+    else
+        rewindByHelper step (n - 1) <| step acc
