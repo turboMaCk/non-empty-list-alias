@@ -136,7 +136,7 @@ any f ( h, t ) =
     f h || List.any f t
 
 
-maximum : NonEmptyList comparabe -> comparable
+maximum : NonEmptyList comparable -> comparable
 maximum ( h, t ) =
     case List.maximum t of
         Just x ->
@@ -150,7 +150,7 @@ maximum ( h, t ) =
             h
 
 
-minimum : NonEmptyList comparabe -> comparable
+minimum : NonEmptyList comparable -> comparable
 minimum ( h, t ) =
     case List.minimum t of
         Just x ->
