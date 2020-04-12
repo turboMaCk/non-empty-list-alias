@@ -413,6 +413,7 @@ This is a more advanced function following [`Comonad`](https://hackage.haskell.o
     -- calculate lenght at each point of NonEmptylist
     extend length ("foo", [ "bar", "baz", "EOF"] )
     --> ( 4, [ 3, 2, 1 ])
+
 -}
 extend : (NonEmptyList a -> b) -> NonEmptyList a -> NonEmptyList b
 extend f =
