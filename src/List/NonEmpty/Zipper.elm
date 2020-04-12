@@ -93,6 +93,10 @@ length (Zipper r) =
     List.length r.prev + List.length r.next + 1
 
 
+
+-- Movement
+
+
 next : Zipper a -> Maybe (Zipper a)
 next (Zipper r) =
     case r.next of
@@ -124,4 +128,36 @@ attemptPrev zipper =
 
 
 
--- Movement
+-- Cycling
+
+
+forward : Zipper a -> Zipper a
+forward (Zipper r) =
+    case r.next of
+        [] ->
+            case List.reverse <| r.focus :: r.prev of
+                -- singleton zipper
+                [] ->
+                    Zipper r
+
+                h :: t ->
+                    Zipper { prev = [], focus = h, next = t }
+
+        h :: t ->
+            Zipper { prev = r.focus :: r.prev, focus = h, next = t }
+
+
+backward : Zipper a -> Zipper a
+backward (Zipper r) =
+    case r.prev of
+        [] ->
+            case List.reverse <| r.focus :: r.next of
+                -- singleton zipper
+                [] ->
+                    Zipper r
+
+                h :: t ->
+                    Zipper { prev = t, focus = h, next = [] }
+
+        h :: t ->
+            Zipper { prev = t, focus = h, next = r.focus :: r.next }

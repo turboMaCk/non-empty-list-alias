@@ -52,4 +52,32 @@ movementTest =
                 Zipper.attemptNext simpleZipper
                     |> Zipper.attemptPrev
                     |> Expect.equal simpleZipper
+        , test "prev on first is Nothing" <|
+            \() ->
+                Zipper.prev simpleZipper
+                    |> Expect.equal Nothing
+        ]
+
+
+cycleTest : Test
+cycleTest =
+    describe "cycling movement"
+        [ test "forward cycles back to first" <|
+            \() ->
+                Zipper.forward simpleZipper
+                    |> Zipper.forward
+                    |> Zipper.forward
+                    |> Zipper.forward
+                    |> Zipper.forward
+                    |> Zipper.forward
+                    |> Zipper.forward
+                    |> Zipper.forward
+                    |> Zipper.forward
+                    |> Zipper.forward
+                    |> Expect.equal simpleZipper
+        , test "backward leads to last" <|
+            \() ->
+                Zipper.backward simpleZipper
+                    |> Zipper.current
+                    |> Expect.equal 9
         ]
