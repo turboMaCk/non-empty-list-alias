@@ -6,6 +6,10 @@
 
 Functions for `NonEmptyList` you already have and `Zipper` implementation that goes with it.
 
+This implementation of non-empty list is using alias to pair `(a, List a)` so comparible type can be produced without dependecy on this library.
+Despite this, this package aims to provide the most feature complete implementation of `NonEmptyList` for Elm and
+includes variety of practical functions like Json decoder as well as high level combinators like `duplicate` and `extend`.
+
 ## Motivation
 
 [elm/core](https://package.elm-lang.org/packages/elm/core/latest/) doesn't come with any sort of `NoneEmptyList` type.
