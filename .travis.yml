@@ -1,2 +1,3 @@
 language: elm
+after_install: npm install -g elm-verify-examples
 script: elm-format --validate . && elm-verify-examples && elm-test
