@@ -5,11 +5,23 @@ type alias NonEmptyList a =
     ( a, List a )
 
 
+{-| Creates nonempty list with only one element.
+
+    singleton 1 --> (1, [])
+
+-}
 singleton : a -> NonEmptyList a
 singleton h =
     ( h, [] )
 
 
+{-| Converts List to Maybe NonEmptyList
+
+    fromList [ 1, 2 ] --> Just (1, [2])
+
+    fromList [] --> Nothing
+
+-}
 fromList : List a -> Maybe (NonEmptyList a)
 fromList xs =
     case xs of
@@ -20,6 +32,11 @@ fromList xs =
             Nothing
 
 
+{-| Converts NonEmptyList to List
+
+    toList ( 1, [ 2 ] ) --> [1, 2]
+
+-}
 toList : NonEmptyList a -> List a
 toList ( h, t ) =
     h :: t
@@ -35,16 +52,34 @@ uncons ( h, t ) =
     ( h, fromList t )
 
 
+{-| Returns first element of the nonempty list
+
+    head ( 1, [ 2 ] ) --> 1
+
+-}
 head : NonEmptyList a -> a
 head ( h, _ ) =
     h
 
 
+{-| Returns tail of the nonempty list.
+The return type is List and may be empty.
+
+    tail ( 1, [ 2, 3 ] ) --> [2, 3]
+
+-}
 tail : NonEmptyList a -> List a
 tail ( _, t ) =
     t
 
 
+{-| Returns last element of the nonempty list.
+
+    last ( 1, [ 2 ] ) --> 2
+
+    last ( 1, [] ) --> 1
+
+-}
 last : NonEmptyList a -> a
 last ( h, t ) =
     Maybe.withDefault h <| lastHelper t
@@ -63,6 +98,13 @@ lastHelper xs =
             lastHelper t
 
 
+{-| Removes first element of the nonempty list.
+
+    dropHead ( 1, [ 2 ] ) --> Just (2, [])
+
+    dropHead ( 1, [] ) --> Nothing
+
+-}
 dropHead : NonEmptyList a -> Maybe (NonEmptyList a)
 dropHead ( _, t ) =
     fromList t
@@ -72,11 +114,23 @@ dropHead ( _, t ) =
 --
 
 
+{-| Map a function over nonempty list.
+
+    map (\x -> x + 1) ( 1, [ 2, 3 ] ) --> (2, [3, 4])
+
+-}
 map : (a -> b) -> NonEmptyList a -> NonEmptyList b
 map f ( h, t ) =
     ( f h, List.map f t )
 
 
+{-| Some as `map` but an index is passed with each element.
+Index starts at 0
+
+    indexedMap (\i x -> String.fromInt i ++ " is " ++ x) ("a", ["b", "c"])
+    --> ("0 is a",["1 is b","2 is c"])
+
+-}
 indexedMap : (Int -> a -> b) -> NonEmptyList a -> NonEmptyList b
 indexedMap f ( h, t ) =
     ( f 0 h, List.indexedMap (\i -> f (i + 1)) t )
@@ -121,21 +175,47 @@ reverse ( h, t ) =
             ( nH, nT )
 
 
+{-| Figure out whether a list contains a value.
+
+    member 2 ( 1, [ 2 ] ) --> True
+
+    member 3 ( 1, [ 2 ] ) --> False
+
+-}
 member : a -> NonEmptyList a -> Bool
 member a ( h, t ) =
     a == h || List.member a t
 
 
+{-| Determine if all elements satisfy some test.
+
+    all Char.isUpper ( 'A', [ 'B' ] ) --> True
+
+    all Char.isUpper ( 'a', [ 'B' ] ) --> False
+
+-}
 all : (a -> Bool) -> NonEmptyList a -> Bool
 all f ( h, t ) =
     f h && List.all f t
 
 
+{-| Determine if any elements satisfy test.
+
+    any Char.isUpper ( 'a', [ 'B' ] ) --> True
+
+    any Char.isUpper ( 'a', [ 'b' ] ) --> False
+
+-}
 any : (a -> Bool) -> NonEmptyList a -> Bool
 any f ( h, t ) =
     f h || List.any f t
 
 
+{-| Find the maximum element.
+
+    maximum ( 5, [ 3, 1, 2 ] ) --> 5
+
+-}
 maximum : NonEmptyList comparable -> comparable
 maximum ( h, t ) =
     case List.maximum t of
@@ -150,6 +230,11 @@ maximum ( h, t ) =
             h
 
 
+{-| Find the minimum element.
+
+    minimum ( 5, [ 3, 1, 2 ] ) --> 1
+
+-}
 minimum : NonEmptyList comparable -> comparable
 minimum ( h, t ) =
     case List.minimum t of
@@ -164,11 +249,21 @@ minimum ( h, t ) =
             h
 
 
+{-| Get the sum of the list elements.
+
+    sum ( 2, [ 2, 2 ] ) --> 6
+
+-}
 sum : NonEmptyList number -> number
 sum =
     List.sum << toList
 
 
+{-| Get the product of the list elements.
+
+    product ( 2, [ 2, 2 ] ) --> 8
+
+-}
 product : NonEmptyList number -> number
 product =
     List.product << toList
