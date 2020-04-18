@@ -1,6 +1,6 @@
 module List.NonEmpty exposing
     ( NonEmptyList
-    , singleton, cons, fromList, fromCons
+    , singleton, cons, fromList, fromCons, unfoldr
     , map, indexedMap, foldl, foldl1, foldr, foldr1, filter, filterMap
     , length, reverse, member, all, any, maximum, minimum, sum, product, last
     , append, concat, concatMap, intersperse, map2, andMap
@@ -8,7 +8,6 @@ module List.NonEmpty exposing
     , isSingleton, head, tail, dropHead, uncons, toList
     , duplicate, extend
     , decodeList, decode
-    , unfoldr
     )
 
 {-|
@@ -18,7 +17,7 @@ module List.NonEmpty exposing
 
 # Create
 
-@docs singleton, cons, fromList, fromCons
+@docs singleton, cons, fromList, fromCons, unfoldr
 
 
 # Transform
