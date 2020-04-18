@@ -18,7 +18,7 @@ This means one usually has to reply on one of the user implementations on `NonEm
 * [mgold/elm-nonempty-list](https://package.elm-lang.org/packages/mgold/elm-nonempty-list/latest/)
 * [hrldcpr/elm-cons](https://package.elm-lang.org/packages/hrldcpr/elm-cons/latest/)
 
-These implementations usually define custom type like `NonEmpty a = NonEmpty a (List a)` and expose the constructor
+These implementations usually define custom type like `NonEmpty a = Cons a (List a)` and expose the constructor
 to make pattern matching possible. Anyway this makes it hard for library authors to provide
 support for `NonEmpty` because they would need to pick one of these libraries and use it as a dependency
 of their own implementation and essentially impose this decision on their users.
@@ -27,7 +27,7 @@ This implementation uses different approach. `NonEmpty` is an alias on the pair 
 Relaying on anonymous data-type like tuple means:
 
 1. [Libraries](https://package.elm-lang.org/packages/elm-community/list-extra/latest/List-Extra#uncons) can produce `NonEmpty` data without depending on specific implementation
-2. Implementation provided by this package can be easily replaced by other implementation without breaking API due to types.
+1. Implementation provided by this package can be easily replaced by other implementation without breaking API due to types.
 
 ### Zipper
 
@@ -43,7 +43,7 @@ My favorite implementation of zipper which doesn't rely on `NonEmpty` is [zwilia
 ### Drawbacks
 
 Compare to other implementations this implementation has not descriptive constructor in value space.
-This means that in pattern matching happens on pair instead of explicit constructor.
+This means that in pattern matching happens on pair instead of explicit constructor like `Cons` or `NonEmpty`.
 
 **conventional library:**
 

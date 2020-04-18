@@ -593,7 +593,9 @@ map2 f ( h1, t1 ) ( h2, t2 ) =
     |> andMap ( "Alice", [ "Bob", "Charlie"] )
     |> andMap ( 30, [ 50, 19 ] )
     |> andMap ( True, [ False, False ])
-    --> ( User "Alice" 30 True, [ User "Bob" 50 False, User "Charlie" 19 False ] )
+    --> ( User "Alice" 30 True
+    --> , [ User "Bob" 50 False, User "Charlie" 19 False ]
+    --> )
 
 -}
 andMap : NonEmptyList a -> NonEmptyList (a -> b) -> NonEmptyList b
@@ -689,10 +691,12 @@ decodeListHelper xs =
     --> Ok ( "foo", [ "bar", "baz" ])
 
     JD.decodeString strings "[]"
-    --> Err <| JD.Failure "Expecting at least ONE ELEMENT array" <| JE.list identity []
+    --> Err <| JD.Failure "Expecting at least ONE ELEMENT array" <|
+    -->     JE.list identity []
 
     JD.decodeString strings "{}"
-    --> Err <| JD.Failure "Expecting a LIST" <| JE.object []
+    --> Err <| JD.Failure "Expecting a LIST" <|
+    -->      JE.object []
 
 -}
 decodeList : Decoder a -> Decoder (NonEmptyList a)
@@ -721,7 +725,8 @@ decodeList decoder =
     --> Ok (1, [ 2, 3 ])
 
     JD.decodeString objectDecoder "{\"head\":true}"
-    --> Err <| JD.Failure "Expecting an OBJECT with a field named `tail`" <| JE.object [ ("head", JE.bool True) ]
+    --> Err <| JD.Failure "Expecting an OBJECT with a field named `tail`" <|
+    -->     JE.object [ ("head", JE.bool True) ]
 
     -- Decoding from Array of Arrays
 
@@ -735,7 +740,8 @@ decodeList decoder =
     --> Ok (True, [False, True])
 
     JD.decodeString nestedArrayDecoder "[false]"
-    --> Err <| JD.Failure "Expecting a LONGER array. Need index 1 but only see 1 entries" <| JE.list JE.bool [False]
+    --> Err <| JD.Failure "Expecting a LONGER array. Need index 1 but only see 1 entries" <|
+    -->     JE.list JE.bool [False]
 
 -}
 decode : Decoder (a -> List a -> NonEmptyList a)
