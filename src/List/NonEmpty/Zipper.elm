@@ -1,6 +1,6 @@
 module List.NonEmpty.Zipper exposing (..)
 
-import List.NonEmpty as NE exposing (NonEmptyList)
+import List.NonEmpty as NE exposing (NonEmpty)
 
 
 {-| Zipper is opaque type because it
@@ -15,7 +15,7 @@ singleton a =
     Zipper [] a []
 
 
-fromNonEmpty : NonEmptyList a -> Zipper a
+fromNonEmpty : NonEmpty a -> Zipper a
 fromNonEmpty ( h, t ) =
     Zipper [] h t
 
@@ -35,7 +35,7 @@ custom p f n =
     Zipper p f n
 
 
-toNonEmpty : Zipper a -> NonEmptyList a
+toNonEmpty : Zipper a -> NonEmpty a
 toNonEmpty (Zipper p f n) =
     case List.reverse p of
         [] ->

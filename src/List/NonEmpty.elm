@@ -1,5 +1,5 @@
 module List.NonEmpty exposing
-    ( NonEmptyList
+    ( NonEmpty
     , singleton, cons, fromList, fromCons, unfoldl, unfoldr
     , map, indexedMap, foldl, foldl1, foldr, foldr1, filter, filterMap
     , length, reverse, member, all, any, maximum, minimum, sum, product, last
@@ -12,7 +12,7 @@ module List.NonEmpty exposing
 
 {-|
 
-@docs NonEmptyList
+@docs NonEmpty
 
 
 # Create
@@ -59,10 +59,10 @@ module List.NonEmpty exposing
 import Json.Decode as Decode exposing (Decoder)
 
 
-{-| NonEmptyList represented
+{-| NonEmpty represented
 by alias on a pair of `a` and `List a`.
 -}
-type alias NonEmptyList a =
+type alias NonEmpty a =
     ( a, List a )
 
 
@@ -72,12 +72,12 @@ type alias NonEmptyList a =
     --> ( 1, [] )
 
 -}
-singleton : a -> NonEmptyList a
+singleton : a -> NonEmpty a
 singleton h =
     ( h, [] )
 
 
-{-| Converts List to Maybe NonEmptyList
+{-| Converts List to Maybe NonEmpty
 
     fromList [ 1, 2 ]
     --> Just ( 1, [ 2 ] )
@@ -86,7 +86,7 @@ singleton h =
     --> Nothing
 
 -}
-fromList : List a -> Maybe (NonEmptyList a)
+fromList : List a -> Maybe (NonEmpty a)
 fromList xs =
     case xs of
         h :: t ->
@@ -104,14 +104,14 @@ fromList xs =
 This function is just an alias on `Tuple.pair`
 
 -}
-fromCons : a -> List a -> NonEmptyList a
+fromCons : a -> List a -> NonEmpty a
 fromCons =
     Tuple.pair
 
 
 {-| Create `NonEmpty` by unfolding other data from left.
 
-This is more expert way of constructing `NonEmptyList`.
+This is more expert way of constructing `NonEmpty`.
 It's useful in rare cases.
 
     stepPrev : Int -> (String, Maybe Int)
@@ -127,14 +127,14 @@ It's useful in rare cases.
     --> ("0", ["1","2","3","4", "5"])
 
 -}
-unfoldl : (a -> ( b, Maybe a )) -> a -> NonEmptyList b
+unfoldl : (a -> ( b, Maybe a )) -> a -> NonEmpty b
 unfoldl f a =
     unfoldrHelp f [] a
 
 
 {-| Create `NonEmpty` by unfolding other data from right.
 
-This is more expert way of constructing `NonEmptyList`.
+This is more expert way of constructing `NonEmpty`.
 It's useful in rare cases.
 
     stepNext : Int -> (String, Maybe Int)
@@ -150,12 +150,12 @@ It's useful in rare cases.
     --> ("0", ["1","2","3","4", "5"])
 
 -}
-unfoldr : (a -> ( b, Maybe a )) -> a -> NonEmptyList b
+unfoldr : (a -> ( b, Maybe a )) -> a -> NonEmpty b
 unfoldr f a =
     reverse <| unfoldrHelp f [] a
 
 
-unfoldrHelp : (a -> ( b, Maybe a )) -> List b -> a -> NonEmptyList b
+unfoldrHelp : (a -> ( b, Maybe a )) -> List b -> a -> NonEmpty b
 unfoldrHelp f acc a =
     case f a of
         ( h, Just next_ ) ->
@@ -165,13 +165,13 @@ unfoldrHelp f acc a =
             ( h, acc )
 
 
-{-| Converts NonEmptyList to List
+{-| Converts NonEmpty to List
 
     toList ( 1, [ 2 ] )
     --> [1, 2]
 
 -}
-toList : NonEmptyList a -> List a
+toList : NonEmpty a -> List a
 toList ( h, t ) =
     h :: t
 
@@ -182,7 +182,7 @@ toList ( h, t ) =
     --> (2, [ 1 ])
 
 -}
-cons : a -> NonEmptyList a -> NonEmptyList a
+cons : a -> NonEmpty a -> NonEmpty a
 cons a ( h, t ) =
     ( a, h :: t )
 
@@ -196,7 +196,7 @@ cons a ( h, t ) =
     --> ( "hello!", Nothing )
 
 -}
-uncons : NonEmptyList a -> ( a, Maybe (NonEmptyList a) )
+uncons : NonEmpty a -> ( a, Maybe (NonEmpty a) )
 uncons ( h, t ) =
     ( h, fromList t )
 
@@ -207,7 +207,7 @@ uncons ( h, t ) =
     --> 1
 
 -}
-head : NonEmptyList a -> a
+head : NonEmpty a -> a
 head ( h, _ ) =
     h
 
@@ -219,7 +219,7 @@ The return type is List and may be empty.
     --> [2, 3]
 
 -}
-tail : NonEmptyList a -> List a
+tail : NonEmpty a -> List a
 tail ( _, t ) =
     t
 
@@ -235,7 +235,7 @@ tail ( _, t ) =
 This function is _O(n)_
 
 -}
-last : NonEmptyList a -> a
+last : NonEmpty a -> a
 last ( h, t ) =
     Maybe.withDefault h <| lastHelper t
 
@@ -262,7 +262,7 @@ lastHelper xs =
     --> Nothing
 
 -}
-dropHead : NonEmptyList a -> Maybe (NonEmptyList a)
+dropHead : NonEmpty a -> Maybe (NonEmpty a)
 dropHead ( _, t ) =
     fromList t
 
@@ -280,7 +280,7 @@ dropHead ( _, t ) =
     --> ( "1", [ "2" ] )
 
 -}
-map : (a -> b) -> NonEmptyList a -> NonEmptyList b
+map : (a -> b) -> NonEmpty a -> NonEmpty b
 map f ( h, t ) =
     ( f h, List.map f t )
 
@@ -292,12 +292,12 @@ Index starts at 0
     --> ("0 is a",["1 is b","2 is c"])
 
 -}
-indexedMap : (Int -> a -> b) -> NonEmptyList a -> NonEmptyList b
+indexedMap : (Int -> a -> b) -> NonEmpty a -> NonEmpty b
 indexedMap f ( h, t ) =
     ( f 0 h, List.indexedMap (\i -> f (i + 1)) t )
 
 
-{-| Reduce `NonEmptyList` from left
+{-| Reduce `NonEmpty` from left
 
     foldl (+) 0 (1, [2,3,4])
     --> 10
@@ -306,12 +306,12 @@ indexedMap f ( h, t ) =
     --> (4, [3,2,1,0])
 
 -}
-foldl : (a -> b -> b) -> b -> NonEmptyList a -> b
+foldl : (a -> b -> b) -> b -> NonEmpty a -> b
 foldl f acc =
     List.foldl f acc << toList
 
 
-{-| Collapse `NonEmptyList a` into `a` value from left
+{-| Collapse `NonEmpty a` into `a` value from left
 
     foldl1 (+) (1, [2,3,4])
     --> 10
@@ -320,12 +320,12 @@ foldl f acc =
     --> "world hello"
 
 -}
-foldl1 : (a -> a -> a) -> NonEmptyList a -> a
+foldl1 : (a -> a -> a) -> NonEmpty a -> a
 foldl1 f ( h, t ) =
     List.foldl f h t
 
 
-{-| Reduce `NonEmptyList` from right
+{-| Reduce `NonEmpty` from right
 
     foldr (+) 0 (1, [2,3,4])
     --> 10
@@ -334,12 +334,12 @@ foldl1 f ( h, t ) =
     --> (1, [2, 3, 4, 5])
 
 -}
-foldr : (a -> b -> b) -> b -> NonEmptyList a -> b
+foldr : (a -> b -> b) -> b -> NonEmpty a -> b
 foldr f acc =
     List.foldr f acc << toList
 
 
-{-| Collapse `NonEmptyList a` into `a` value from right
+{-| Collapse `NonEmpty a` into `a` value from right
 
     foldr1 (+) (1, [2,3,4])
     --> 10
@@ -348,7 +348,7 @@ foldr f acc =
     --> "hello world"
 
 -}
-foldr1 : (a -> a -> a) -> NonEmptyList a -> a
+foldr1 : (a -> a -> a) -> NonEmpty a -> a
 foldr1 f =
     foldl1 f << reverse
 
@@ -362,7 +362,7 @@ foldr1 f =
     --> Just (2, [4] )
 
 -}
-filter : (a -> Bool) -> NonEmptyList a -> Maybe (NonEmptyList a)
+filter : (a -> Bool) -> NonEmpty a -> Maybe (NonEmpty a)
 filter f =
     fromList << List.filter f << toList
 
@@ -376,7 +376,7 @@ filter f =
     --> Nothing
 
 -}
-filterMap : (a -> Maybe b) -> NonEmptyList a -> Maybe (NonEmptyList b)
+filterMap : (a -> Maybe b) -> NonEmpty a -> Maybe (NonEmpty b)
 filterMap f =
     fromList << List.filterMap f << toList
 
@@ -385,7 +385,7 @@ filterMap f =
 --
 
 
-{-| Calculate leght of `NonEmptyList`
+{-| Calculate leght of `NonEmpty`
 
     length ( 1, [ 2, 3 ] )
     --> 3
@@ -394,18 +394,18 @@ filterMap f =
     --> 1
 
 -}
-length : NonEmptyList a -> Int
+length : NonEmpty a -> Int
 length ( _, t ) =
     List.length t + 1
 
 
-{-| Reverse `NonEmptyList`
+{-| Reverse `NonEmpty`
 
     reverse (1, [2, 3, 4])
     --> (4, [3, 2, 1])
 
 -}
-reverse : NonEmptyList a -> NonEmptyList a
+reverse : NonEmpty a -> NonEmpty a
 reverse ( h, t ) =
     case List.reverse <| h :: t of
         [] ->
@@ -424,7 +424,7 @@ reverse ( h, t ) =
     --> False
 
 -}
-member : a -> NonEmptyList a -> Bool
+member : a -> NonEmpty a -> Bool
 member a ( h, t ) =
     a == h || List.member a t
 
@@ -438,7 +438,7 @@ member a ( h, t ) =
     --> False
 
 -}
-all : (a -> Bool) -> NonEmptyList a -> Bool
+all : (a -> Bool) -> NonEmpty a -> Bool
 all f ( h, t ) =
     f h && List.all f t
 
@@ -452,7 +452,7 @@ all f ( h, t ) =
     --> False
 
 -}
-any : (a -> Bool) -> NonEmptyList a -> Bool
+any : (a -> Bool) -> NonEmpty a -> Bool
 any f ( h, t ) =
     f h || List.any f t
 
@@ -463,7 +463,7 @@ any f ( h, t ) =
     --> 5
 
 -}
-maximum : NonEmptyList comparable -> comparable
+maximum : NonEmpty comparable -> comparable
 maximum ( h, t ) =
     case List.maximum t of
         Just x ->
@@ -483,7 +483,7 @@ maximum ( h, t ) =
     --> 2
 
 -}
-minimum : NonEmptyList comparable -> comparable
+minimum : NonEmpty comparable -> comparable
 minimum ( h, t ) =
     case List.minimum t of
         Just x ->
@@ -503,7 +503,7 @@ minimum ( h, t ) =
     --> 6
 
 -}
-sum : NonEmptyList number -> number
+sum : NonEmpty number -> number
 sum =
     List.sum << toList
 
@@ -514,7 +514,7 @@ sum =
     --> 8
 
 -}
-product : NonEmptyList number -> number
+product : NonEmpty number -> number
 product =
     List.product << toList
 
@@ -525,7 +525,7 @@ product =
     --> ( 1, [ 2, 3, 4, 5 ] )
 
 -}
-append : NonEmptyList a -> NonEmptyList a -> NonEmptyList a
+append : NonEmpty a -> NonEmpty a -> NonEmpty a
 append ne1 ne2 =
     case toList ne2 of
         [] ->
@@ -541,7 +541,7 @@ append ne1 ne2 =
     --> (1,[2,3,4,5,6,7,8,9,10,11])
 
 -}
-concat : NonEmptyList (NonEmptyList a) -> NonEmptyList a
+concat : NonEmpty (NonEmpty a) -> NonEmpty a
 concat ( h, t ) =
     let
         hx =
@@ -562,12 +562,12 @@ concat ( h, t ) =
     --> ( 2, [ 2, 3, 3 ] )
 
 -}
-concatMap : (a -> NonEmptyList b) -> NonEmptyList a -> NonEmptyList b
+concatMap : (a -> NonEmpty b) -> NonEmpty a -> NonEmpty b
 concatMap f =
     concat << map f
 
 
-{-| Create `NonEmptyList` containing sub `NoneEmptyList`s.
+{-| Create `NonEmpty` containing sub `NoneEmptyList`s.
 
 This is a more advanced function following [`Comonad`](https://hackage.haskell.org/package/comonad)
 
@@ -578,7 +578,7 @@ This is a more advanced function following [`Comonad`](https://hackage.haskell.o
     --> ( ( "alone", [] ), [  ] )
 
 -}
-duplicate : NonEmptyList a -> NonEmptyList (NonEmptyList a)
+duplicate : NonEmpty a -> NonEmpty (NonEmpty a)
 duplicate ne =
     ( ne
     , case fromList <| tail ne of
@@ -590,7 +590,7 @@ duplicate ne =
     )
 
 
-duplicateHelper : List (NonEmptyList a) -> NonEmptyList a -> List (NonEmptyList a)
+duplicateHelper : List (NonEmpty a) -> NonEmpty a -> List (NonEmpty a)
 duplicateHelper acc (( _, t ) as ne) =
     case fromList t of
         Nothing ->
@@ -600,7 +600,7 @@ duplicateHelper acc (( _, t ) as ne) =
             duplicateHelper (ne :: acc) newNE
 
 
-{-| Take sub `NonEmptyList` for each part of `NoneEmptyList` to generate new `NonEmptyList`
+{-| Take sub `NonEmpty` for each part of `NoneEmptyList` to generate new `NonEmpty`
 
 This is a more advanced function following [`Comonad`](https://hackage.haskell.org/package/comonad)
 
@@ -613,7 +613,7 @@ This is a more advanced function following [`Comonad`](https://hackage.haskell.o
     --> ( 4, [ 3, 2, 1 ])
 
 -}
-extend : (NonEmptyList a -> b) -> NonEmptyList a -> NonEmptyList b
+extend : (NonEmpty a -> b) -> NonEmpty a -> NonEmpty b
 extend f =
     map f << duplicate
 
@@ -630,7 +630,7 @@ extend f =
     --> ("1", [])
 
 -}
-intersperse : a -> NonEmptyList a -> NonEmptyList a
+intersperse : a -> NonEmpty a -> NonEmpty a
 intersperse x ne =
     case ne of
         ( _, [] ) ->
@@ -656,7 +656,7 @@ In case where one of the two lists is longer the extra elements are ignored
     --> ( ( 1, "foo"), [ ( 2, "bar" ) ] )
 
 -}
-map2 : (a -> b -> c) -> NonEmptyList a -> NonEmptyList b -> NonEmptyList c
+map2 : (a -> b -> c) -> NonEmpty a -> NonEmpty b -> NonEmpty c
 map2 f ( h1, t1 ) ( h2, t2 ) =
     ( f h1 h2, List.map2 f t1 t2 )
 
@@ -682,12 +682,12 @@ map2 f ( h1, t1 ) ( h2, t2 ) =
     --> )
 
 -}
-andMap : NonEmptyList a -> NonEmptyList (a -> b) -> NonEmptyList b
+andMap : NonEmpty a -> NonEmpty (a -> b) -> NonEmpty b
 andMap =
     map2 (|>)
 
 
-sortHelper : (List a -> List a) -> ( a, List a ) -> NonEmptyList a
+sortHelper : (List a -> List a) -> ( a, List a ) -> NonEmpty a
 sortHelper f ne =
     case f <| toList ne of
         h :: t ->
@@ -704,7 +704,7 @@ sortHelper f ne =
     --> (1, [2, 3, 4])
 
 -}
-sort : NonEmptyList comparable -> NonEmptyList comparable
+sort : NonEmpty comparable -> NonEmpty comparable
 sort =
     sortHelper List.sort
 
@@ -715,14 +715,14 @@ sort =
     --> ("1", ["22", "333", "4444"])
 
 -}
-sortBy : (a -> comparable) -> NonEmptyList a -> NonEmptyList a
+sortBy : (a -> comparable) -> NonEmpty a -> NonEmpty a
 sortBy f =
     sortHelper (List.sortBy f)
 
 
 {-| Sort values with a custom comparison function.
 -}
-sortWith : (a -> a -> Order) -> NonEmptyList a -> NonEmptyList a
+sortWith : (a -> a -> Order) -> NonEmpty a -> NonEmpty a
 sortWith f =
     sortHelper (List.sortWith f)
 
@@ -736,7 +736,7 @@ sortWith f =
     --> False
 
 -}
-isSingleton : NonEmptyList a -> Bool
+isSingleton : NonEmpty a -> Bool
 isSingleton ( _, t ) =
     List.isEmpty t
 
@@ -752,7 +752,7 @@ isSingleton ( _, t ) =
 -- JSON functions
 
 
-decodeListHelper : List a -> Decoder (NonEmptyList a)
+decodeListHelper : List a -> Decoder (NonEmpty a)
 decodeListHelper xs =
     case fromList xs of
         Just res ->
@@ -762,12 +762,12 @@ decodeListHelper xs =
             Decode.fail "Expecting at least ONE ELEMENT array"
 
 
-{-| Decode JSON array to `NonEmptyList`
+{-| Decode JSON array to `NonEmpty`
 
     import Json.Decode as JD exposing (Decoder)
     import Json.Encode as JE
 
-    strings : Decoder (NonEmptyList String)
+    strings : Decoder (NonEmpty String)
     strings =
         decodeList JD.string
 
@@ -783,7 +783,7 @@ decodeListHelper xs =
     -->      JE.object []
 
 -}
-decodeList : Decoder a -> Decoder (NonEmptyList a)
+decodeList : Decoder a -> Decoder (NonEmpty a)
 decodeList decoder =
     Decode.list decoder
         |> Decode.andThen decodeListHelper
@@ -798,7 +798,7 @@ decodeList decoder =
 
     -- Decoding from custom object
 
-    objectDecoder : Decoder (NonEmptyList Int)
+    objectDecoder : Decoder (NonEmpty Int)
     objectDecoder =
         decode
          |> JDP.required "head" JD.int
@@ -814,7 +814,7 @@ decodeList decoder =
 
     -- Decoding from Array of Arrays
 
-    nestedArrayDecoder : Decoder (NonEmptyList Bool)
+    nestedArrayDecoder : Decoder (NonEmpty Bool)
     nestedArrayDecoder =
         decode
         |> JDE.andMap (JD.index 0 JD.bool)
@@ -828,6 +828,6 @@ decodeList decoder =
     -->     JE.list JE.bool [False]
 
 -}
-decode : Decoder (a -> List a -> NonEmptyList a)
+decode : Decoder (a -> List a -> NonEmpty a)
 decode =
     Decode.succeed fromCons
