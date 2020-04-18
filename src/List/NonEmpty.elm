@@ -1,7 +1,7 @@
 module List.NonEmpty exposing
     ( NonEmptyList
     , singleton, cons, fromList, fromCons
-    , map, indexedMap, foldl, foldr, filter, filterMap
+    , map, indexedMap, foldl, foldl1, foldr, foldr1, filter, filterMap
     , length, reverse, member, all, any, maximum, minimum, sum, product, last
     , append, concat, concatMap, intersperse, map2, andMap
     , sort, sortBy, sortWith
@@ -22,7 +22,7 @@ module List.NonEmpty exposing
 
 # Transform
 
-@docs map, indexedMap, foldl, foldr, filter, filterMap
+@docs map, indexedMap, foldl, foldl1, foldr, foldr1, filter, filterMap
 
 
 # Utilities
@@ -255,6 +255,20 @@ foldl f acc =
     List.foldl f acc << toList
 
 
+{-| Collapse `NonEmptyList a` into `a` value from left
+
+    foldl1 (+) (1, [2,3,4])
+    --> 10
+
+    foldl1 (++) ("hello", [" ","world"])
+    --> "world hello"
+
+-}
+foldl1 : (a -> a -> a) -> NonEmptyList a -> a
+foldl1 f ( h, t ) =
+    List.foldl f h t
+
+
 {-| Reduce `NonEmptyList` from right
 
     foldr (+) 0 (1, [2,3,4])
@@ -267,6 +281,20 @@ foldl f acc =
 foldr : (a -> b -> b) -> b -> NonEmptyList a -> b
 foldr f acc =
     List.foldr f acc << toList
+
+
+{-| Collapse `NonEmptyList a` into `a` value from right
+
+    foldr1 (+) (1, [2,3,4])
+    --> 10
+
+    foldr1 (++) ("hello", [" ","world"])
+    --> "hello world"
+
+-}
+foldr1 : (a -> a -> a) -> NonEmptyList a -> a
+foldr1 f =
+    foldl1 f << reverse
 
 
 {-| Keep elements that satisfy the test
