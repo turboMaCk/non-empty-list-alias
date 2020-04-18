@@ -7,21 +7,17 @@ import List.NonEmpty as NE exposing (NonEmptyList)
 copntains some internal semantic which we don't want to leak to a user
 -}
 type Zipper a
-    = Zipper
-        { prev : List a
-        , focus : a
-        , next : List a
-        }
+    = Zipper (List a) a (List a)
 
 
 singleton : a -> Zipper a
 singleton a =
-    Zipper { prev = [], focus = a, next = [] }
+    Zipper [] a []
 
 
 fromNonEmpty : NonEmptyList a -> Zipper a
 fromNonEmpty ( h, t ) =
-    Zipper { prev = [], focus = h, next = t }
+    Zipper [] h t
 
 
 fromList : List a -> Maybe (Zipper a)
@@ -36,21 +32,17 @@ fromCons a =
 
 custom : List a -> a -> List a -> Zipper a
 custom p f n =
-    Zipper
-        { prev = p
-        , focus = f
-        , next = n
-        }
+    Zipper p f n
 
 
 toNonEmpty : Zipper a -> NonEmptyList a
-toNonEmpty (Zipper r) =
-    case List.reverse r.prev of
+toNonEmpty (Zipper p f n) =
+    case List.reverse p of
         [] ->
-            ( r.focus, r.next )
+            ( f, n )
 
-        h :: _ ->
-            ( h, r.focus :: r.next )
+        h :: t ->
+            ( h, t ++ f :: n )
 
 
 toList : Zipper a -> List a
@@ -63,43 +55,33 @@ toList =
 
 
 current : Zipper a -> a
-current (Zipper { focus }) =
+current (Zipper _ focus _) =
     focus
 
 
 listNext : Zipper a -> List a
-listNext (Zipper r) =
-    r.next
+listNext (Zipper _ _ n) =
+    n
 
 
 listPrev : Zipper a -> List a
-listPrev (Zipper r) =
-    List.reverse r.prev
+listPrev (Zipper p _ _) =
+    List.reverse p
 
 
 hasNext : Zipper a -> Bool
-hasNext (Zipper r) =
-    case r.next of
-        [] ->
-            False
-
-        _ ->
-            True
+hasNext (Zipper _ _ n) =
+    not <| List.isEmpty n
 
 
 hasPrev : Zipper a -> Bool
-hasPrev (Zipper r) =
-    case r.prev of
-        [] ->
-            False
-
-        _ ->
-            True
+hasPrev (Zipper p _ _) =
+    not <| List.isEmpty p
 
 
 length : Zipper a -> Int
-length (Zipper r) =
-    List.length r.prev + List.length r.next + 1
+length (Zipper p _ n) =
+    List.length p + List.length n + 1
 
 
 
@@ -107,23 +89,23 @@ length (Zipper r) =
 
 
 next : Zipper a -> Maybe (Zipper a)
-next (Zipper r) =
-    case r.next of
+next (Zipper p f n) =
+    case n of
         [] ->
             Nothing
 
         h :: t ->
-            Just <| Zipper { prev = r.focus :: r.prev, focus = h, next = t }
+            Just <| Zipper (f :: p) h t
 
 
 prev : Zipper a -> Maybe (Zipper a)
-prev (Zipper r) =
-    case r.prev of
+prev (Zipper p f n) =
+    case p of
         [] ->
             Nothing
 
         h :: t ->
-            Just <| Zipper { prev = t, focus = h, next = r.focus :: r.next }
+            Just <| Zipper t h <| f :: n
 
 
 attemptNext : Zipper a -> Zipper a
@@ -189,35 +171,35 @@ attemptByHelper step n acc =
 
 
 forward : Zipper a -> Zipper a
-forward (Zipper r) =
-    case r.next of
+forward (Zipper p f n) =
+    case n of
         [] ->
-            case List.reverse <| r.focus :: r.prev of
+            case List.reverse <| f :: p of
                 -- singleton zipper
                 [] ->
-                    Zipper r
+                    Zipper p f n
 
                 h :: t ->
-                    Zipper { prev = [], focus = h, next = t }
+                    Zipper [] h t
 
         h :: t ->
-            Zipper { prev = r.focus :: r.prev, focus = h, next = t }
+            Zipper (f :: p) h t
 
 
 backward : Zipper a -> Zipper a
-backward (Zipper r) =
-    case r.prev of
+backward (Zipper p f n) =
+    case p of
         [] ->
-            case List.reverse <| r.focus :: r.next of
+            case List.reverse <| f :: n of
                 -- singleton zipper
                 [] ->
-                    Zipper r
+                    Zipper p f n
 
                 h :: t ->
-                    Zipper { prev = t, focus = h, next = [] }
+                    Zipper t h []
 
         h :: t ->
-            Zipper { prev = t, focus = h, next = r.focus :: r.next }
+            Zipper t h <| f :: n
 
 
 forwardBy : Int -> Zipper a -> Zipper a
@@ -244,12 +226,9 @@ rewindByHelper step n acc =
 
 
 map : (a -> b) -> Zipper a -> Zipper b
-map f (Zipper r) =
-    Zipper
-        { prev = List.map f r.prev
-        , focus = f r.focus
-        , next = List.map f r.next
-        }
+map fc (Zipper p f n) =
+    Zipper (List.map fc p) (fc f) <|
+        List.map fc n
 
 
 
