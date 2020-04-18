@@ -8,6 +8,7 @@ module List.NonEmpty exposing
     , isSingleton, head, tail, dropHead, uncons, toList
     , duplicate, extend
     , decodeList, decode
+    , unfoldr
     )
 
 {-|
@@ -107,6 +108,36 @@ This function is just an alias on `Tuple.pair`
 fromCons : a -> List a -> NonEmptyList a
 fromCons =
     Tuple.pair
+
+
+{-| Create `NonEmpty` by unfolding other data.
+
+    next : Int -> (String, Maybe Int)
+    next n =
+        ( String.fromInt n
+        , if n < 5 then
+            Just (n+1)
+          else
+             Nothing
+         )
+
+    unfoldr next 0
+    --> ("0", ["1","2","3","4", "5"])
+
+-}
+unfoldr : (a -> ( b, Maybe a )) -> a -> NonEmptyList b
+unfoldr f a =
+    unfoldrHelp f [] a
+
+
+unfoldrHelp : (a -> ( b, Maybe a )) -> List b -> a -> NonEmptyList b
+unfoldrHelp f acc a =
+    case f a of
+        ( h, Just next_ ) ->
+            unfoldrHelp f (h :: acc) next_
+
+        ( h, Nothing ) ->
+            reverse ( h, acc )
 
 
 {-| Converts NonEmptyList to List
