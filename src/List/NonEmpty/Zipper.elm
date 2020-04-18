@@ -34,6 +34,15 @@ fromCons a =
     fromNonEmpty << NE.fromCons a
 
 
+custom : List a -> a -> List a -> Zipper a
+custom p f n =
+    Zipper
+        { prev = p
+        , focus = f
+        , next = n
+        }
+
+
 toNonEmpty : Zipper a -> NonEmptyList a
 toNonEmpty (Zipper r) =
     case List.reverse r.prev of
@@ -228,3 +237,16 @@ rewindByHelper step n acc =
 
     else
         rewindByHelper step (n - 1) <| step acc
+
+
+
+-- Functor
+
+
+map : (a -> b) -> Zipper a -> Zipper b
+map f (Zipper r) =
+    Zipper
+        { prev = List.map f r.prev
+        , focus = f r.focus
+        , next = List.map f r.next
+        }
