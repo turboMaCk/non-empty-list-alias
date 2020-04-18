@@ -1,6 +1,6 @@
 module List.NonEmpty exposing
     ( NonEmptyList
-    , singleton, cons, fromList, fromCons, unfoldr
+    , singleton, cons, fromList, fromCons, unfoldl, unfoldr
     , map, indexedMap, foldl, foldl1, foldr, foldr1, filter, filterMap
     , length, reverse, member, all, any, maximum, minimum, sum, product, last
     , append, concat, concatMap, intersperse, map2, andMap
@@ -17,7 +17,7 @@ module List.NonEmpty exposing
 
 # Create
 
-@docs singleton, cons, fromList, fromCons, unfoldr
+@docs singleton, cons, fromList, fromCons, unfoldl, unfoldr
 
 
 # Transform
@@ -96,7 +96,7 @@ fromList xs =
             Nothing
 
 
-{-| Cons element onto `List` to create `NoneEmptylist`
+{-| Cons element onto `List` to create `NoneEmptyList`
 
     fromCons 0 [ 1, 2 ]
     --> (0, [1, 2])
@@ -109,24 +109,50 @@ fromCons =
     Tuple.pair
 
 
-{-| Create `NonEmpty` by unfolding other data.
+{-| Create `NonEmpty` by unfolding other data from left.
 
-    next : Int -> (String, Maybe Int)
-    next n =
+This is more expert way of constructing `NonEmptyList`.
+It's useful in rare cases.
+
+    stepPrev : Int -> (String, Maybe Int)
+    stepPrev n =
         ( String.fromInt n
-        , if n < 5 then
-            Just (n+1)
+        , if n > 0 then
+            Just (n - 1)
           else
              Nothing
          )
 
-    unfoldr next 0
+    unfoldl stepPrev 5
+    --> ("0", ["1","2","3","4", "5"])
+
+-}
+unfoldl : (a -> ( b, Maybe a )) -> a -> NonEmptyList b
+unfoldl f a =
+    unfoldrHelp f [] a
+
+
+{-| Create `NonEmpty` by unfolding other data from right.
+
+This is more expert way of constructing `NonEmptyList`.
+It's useful in rare cases.
+
+    stepNext : Int -> (String, Maybe Int)
+    stepNext n =
+        ( String.fromInt n
+        , if n < 5 then
+            Just (n + 1)
+          else
+             Nothing
+         )
+
+    unfoldr stepNext 0
     --> ("0", ["1","2","3","4", "5"])
 
 -}
 unfoldr : (a -> ( b, Maybe a )) -> a -> NonEmptyList b
 unfoldr f a =
-    unfoldrHelp f [] a
+    reverse <| unfoldrHelp f [] a
 
 
 unfoldrHelp : (a -> ( b, Maybe a )) -> List b -> a -> NonEmptyList b
@@ -136,7 +162,7 @@ unfoldrHelp f acc a =
             unfoldrHelp f (h :: acc) next_
 
         ( h, Nothing ) ->
-            reverse ( h, acc )
+            ( h, acc )
 
 
 {-| Converts NonEmptyList to List
