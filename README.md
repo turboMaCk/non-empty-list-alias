@@ -73,7 +73,7 @@ NonEmptyList is:
 
 List.NonEmpty.Zipper is:
 
-* [ ] Functor
-* [ ] Foldable
-* [ ] Applicative
-* [ ] Comonad
+* [x] Functor
+* [x] Foldable
+* [x] Applicative
+* [x] Comonad

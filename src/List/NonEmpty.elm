@@ -1,6 +1,6 @@
 module List.NonEmpty exposing
     ( NonEmptyList
-    , singleton, cons, fromList, fromCons
+    , singleton, cons, fromList, fromCons, unfoldl, unfoldr
     , map, indexedMap, foldl, foldl1, foldr, foldr1, filter, filterMap
     , length, reverse, member, all, any, maximum, minimum, sum, product, last
     , append, concat, concatMap, intersperse, map2, andMap
@@ -17,7 +17,7 @@ module List.NonEmpty exposing
 
 # Create
 
-@docs singleton, cons, fromList, fromCons
+@docs singleton, cons, fromList, fromCons, unfoldl, unfoldr
 
 
 # Transform
@@ -96,7 +96,7 @@ fromList xs =
             Nothing
 
 
-{-| Cons element onto `List` to create `NoneEmptylist`
+{-| Cons element onto `List` to create `NoneEmptyList`
 
     fromCons 0 [ 1, 2 ]
     --> (0, [1, 2])
@@ -107,6 +107,62 @@ This function is just an alias on `Tuple.pair`
 fromCons : a -> List a -> NonEmptyList a
 fromCons =
     Tuple.pair
+
+
+{-| Create `NonEmpty` by unfolding other data from left.
+
+This is more expert way of constructing `NonEmptyList`.
+It's useful in rare cases.
+
+    stepPrev : Int -> (String, Maybe Int)
+    stepPrev n =
+        ( String.fromInt n
+        , if n > 0 then
+            Just (n - 1)
+          else
+             Nothing
+         )
+
+    unfoldl stepPrev 5
+    --> ("0", ["1","2","3","4", "5"])
+
+-}
+unfoldl : (a -> ( b, Maybe a )) -> a -> NonEmptyList b
+unfoldl f a =
+    unfoldrHelp f [] a
+
+
+{-| Create `NonEmpty` by unfolding other data from right.
+
+This is more expert way of constructing `NonEmptyList`.
+It's useful in rare cases.
+
+    stepNext : Int -> (String, Maybe Int)
+    stepNext n =
+        ( String.fromInt n
+        , if n < 5 then
+            Just (n + 1)
+          else
+             Nothing
+         )
+
+    unfoldr stepNext 0
+    --> ("0", ["1","2","3","4", "5"])
+
+-}
+unfoldr : (a -> ( b, Maybe a )) -> a -> NonEmptyList b
+unfoldr f a =
+    reverse <| unfoldrHelp f [] a
+
+
+unfoldrHelp : (a -> ( b, Maybe a )) -> List b -> a -> NonEmptyList b
+unfoldrHelp f acc a =
+    case f a of
+        ( h, Just next_ ) ->
+            unfoldrHelp f (h :: acc) next_
+
+        ( h, Nothing ) ->
+            ( h, acc )
 
 
 {-| Converts NonEmptyList to List
@@ -688,9 +744,9 @@ isSingleton ( _, t ) =
 
 {- Other function candidates:
 
-   * take?
-   * drop?
-   * partition?
+   * take
+   * drop
+   * partition
    * unzip?
 -}
 -- JSON functions
