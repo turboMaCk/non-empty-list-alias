@@ -250,3 +250,27 @@ map f (Zipper r) =
         , focus = f r.focus
         , next = List.map f r.next
         }
+
+
+
+-- Foldable
+
+
+foldl : (a -> b -> b) -> b -> Zipper a -> b
+foldl f acc =
+    NE.foldl f acc << toNonEmpty
+
+
+foldl1 : (a -> a -> a) -> Zipper a -> a
+foldl1 f =
+    NE.foldr1 f << toNonEmpty
+
+
+foldr : (a -> b -> b) -> b -> Zipper a -> b
+foldr f acc =
+    NE.foldr f acc << toNonEmpty
+
+
+foldr1 : (a -> a -> a) -> Zipper a -> a
+foldr1 f =
+    NE.foldr1 f << toNonEmpty
