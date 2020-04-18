@@ -256,6 +256,20 @@ foldr1 f =
 
 
 
+-- Applicative
+
+
+map2 : (a -> b -> c) -> Zipper a -> Zipper b -> Zipper c
+map2 f (Zipper p1 f1 n1) (Zipper p2 f2 n2) =
+    Zipper (List.map2 f p1 p2) (f f1 f2) (List.map2 f n1 n2)
+
+
+andMap : Zipper a -> Zipper (a -> b) -> Zipper b
+andMap =
+    map2 (|>)
+
+
+
 -- Comonad
 
 
