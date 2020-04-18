@@ -719,9 +719,9 @@ isSingleton ( _, t ) =
 
 {- Other function candidates:
 
-   * take?
-   * drop?
-   * partition?
+   * take
+   * drop
+   * partition
    * unzip?
 -}
 -- JSON functions

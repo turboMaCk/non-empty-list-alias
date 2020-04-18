@@ -253,3 +253,32 @@ foldr f acc =
 foldr1 : (a -> a -> a) -> Zipper a -> a
 foldr1 f =
     NE.foldr1 f << toNonEmpty
+
+
+
+-- Comonad
+
+
+duplicate : Zipper a -> Zipper (Zipper a)
+duplicate =
+    genericMove prev next
+
+
+extend : (Zipper a -> b) -> Zipper a -> Zipper b
+extend f =
+    map f << duplicate
+
+
+maybeIter : (a -> Maybe a) -> List a -> a -> List a
+maybeIter f acc a =
+    case f a of
+        Just val ->
+            maybeIter f (val :: acc) val
+
+        Nothing ->
+            List.reverse acc
+
+
+genericMove : (a -> Maybe a) -> (a -> Maybe a) -> a -> Zipper a
+genericMove f g z =
+    Zipper (maybeIter f [] z) z (maybeIter g [] z)
