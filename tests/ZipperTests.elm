@@ -129,3 +129,28 @@ cycleTest =
                     |> Zipper.current
                     |> Expect.equal 7
         ]
+
+
+comonadTest : Test
+comonadTest =
+    describe "comonad"
+        [ test "extend curret is identity" <|
+            \() ->
+                Zipper.extend Zipper.current simpleZipper
+                    |> Expect.equal simpleZipper
+        , test "extend identity is duplicate" <|
+            \() ->
+                Zipper.extend identity simpleZipper
+                    |> Expect.equal (Zipper.duplicate simpleZipper)
+        ]
+
+
+applicativeTest : Test
+applicativeTest =
+    describe "applicative"
+        [ test "uniformely distibuted" <|
+            \() ->
+                Zipper.map (+) simpleZipper
+                    |> Zipper.andMap simpleZipper
+                    |> Expect.equal (Zipper.map ((*) 2) simpleZipper)
+        ]
