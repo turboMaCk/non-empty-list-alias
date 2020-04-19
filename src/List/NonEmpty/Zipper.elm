@@ -166,6 +166,26 @@ attemptByHelper step n acc =
                 acc
 
 
+start : Zipper a -> Zipper a
+start =
+    toEndHelper prev
+
+
+end : Zipper a -> Zipper a
+end =
+    toEndHelper next
+
+
+toEndHelper : (a -> Maybe a) -> a -> a
+toEndHelper f acc =
+    case f acc of
+        Just val ->
+            toEndHelper f val
+
+        Nothing ->
+            acc
+
+
 
 -- Cycling
 
