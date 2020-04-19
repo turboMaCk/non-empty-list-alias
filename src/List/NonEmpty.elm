@@ -5,7 +5,7 @@ module List.NonEmpty exposing
     , length, reverse, member, all, any, maximum, minimum, sum, product, last
     , append, concat, concatMap, intersperse, map2, andMap
     , sort, sortBy, sortWith
-    , isSingleton, head, tail, dropHead, uncons, toList
+    , isSingleton, head, tail, take, dropHead, drop, uncons, toList
     , duplicate, extend
     , decodeList, decode
     )
@@ -42,7 +42,7 @@ module List.NonEmpty exposing
 
 # Deconstruct
 
-@docs isSingleton, head, tail, dropHead, uncons, toList
+@docs isSingleton, head, tail, take, dropHead, drop, uncons, toList
 
 
 # Expand
@@ -59,14 +59,18 @@ module List.NonEmpty exposing
 import Json.Decode as Decode exposing (Decoder)
 
 
-{-| NonEmpty represented
+{-| `NonEmpty` list is represented
 by alias on a pair of `a` and `List a`.
+
+This makes it possible to construct value of non empty List
+without relying on any specific implementation of this type.
+
 -}
 type alias NonEmpty a =
     ( a, List a )
 
 
-{-| Creates nonempty list with only one element.
+{-| Creates `NonEmpty` list with only one element.
 
     singleton 1
     --> ( 1, [] )
@@ -77,7 +81,7 @@ singleton h =
     ( h, [] )
 
 
-{-| Converts List to Maybe NonEmpty
+{-| Converts List to `Maybe NonEmpty`.
 
     fromList [ 1, 2 ]
     --> Just ( 1, [ 2 ] )
@@ -96,7 +100,7 @@ fromList xs =
             Nothing
 
 
-{-| Cons element onto `List` to create `NoneEmptyList`
+{-| Cons element onto `List` to create `NoneEmpty`.
 
     fromCons 0 [ 1, 2 ]
     --> (0, [1, 2])
@@ -165,7 +169,7 @@ unfoldrHelp f acc a =
             ( h, acc )
 
 
-{-| Converts NonEmpty to List
+{-| Converts `NonEmpty` to `List`.
 
     toList ( 1, [ 2 ] )
     --> [1, 2]
@@ -176,7 +180,7 @@ toList ( h, t ) =
     h :: t
 
 
-{-| Add element to the begining of `NonEmptylist`.
+{-| Add element to the begining of `NonEmpty`.
 
     cons 2 ( 1, [] )
     --> (2, [ 1 ])
@@ -201,7 +205,7 @@ uncons ( h, t ) =
     ( h, fromList t )
 
 
-{-| Returns first element of the nonempty list
+{-| Returns first element of the `NonEmpty`.
 
     head ( 1, [ 2 ] )
     --> 1
@@ -212,11 +216,14 @@ head ( h, _ ) =
     h
 
 
-{-| Returns tail of the nonempty list.
+{-| Returns tail of the `NonEmpty`.
 The return type is List and may be empty.
 
     tail ( 1, [ 2, 3 ] )
     --> [2, 3]
+
+If you're looking for function that produces
+another `NonEmpty` see [`dropHead`](#dropHead)
 
 -}
 tail : NonEmpty a -> List a
@@ -224,7 +231,7 @@ tail ( _, t ) =
     t
 
 
-{-| Returns last element of the nonempty list.
+{-| Returns last element of the `NonEmpty`.
 
     last ( 1, [ 2 ] )
     --> 2
@@ -253,7 +260,21 @@ lastHelper xs =
             lastHelper t
 
 
-{-| Removes first element of the nonempty list.
+{-| Take first n elements of `NonEmpty`.
+
+    take 2 ( 1, [ 2, 3, 4 ] )
+    --> ( 1, [ 2 ] )
+
+    take 0 ( 1, [ 2, 3, 4 ] )
+    --> ( 1, [] )
+
+-}
+take : Int -> NonEmpty a -> NonEmpty a
+take n ( h, t ) =
+    ( h, List.take (n - 1) t )
+
+
+{-| Removes first element of the `NonEmpty`.
 
     dropHead ( 1, [ 2 ] )
     --> Just (2, [])
@@ -267,11 +288,31 @@ dropHead ( _, t ) =
     fromList t
 
 
+{-| Drop first n elements of `NonEmpty`.
+
+    drop 2 ( 1, [ 2, 3, 4 ] )
+    --> Just ( 3, [4] )
+
+-}
+drop : Int -> NonEmpty a -> Maybe (NonEmpty a)
+drop n ne =
+    if n > 0 then
+        case dropHead ne of
+            Just new ->
+                drop (n - 1) new
+
+            Nothing ->
+                Nothing
+
+    else
+        Just ne
+
+
 
 --
 
 
-{-| Map a function over nonempty list.
+{-| Map a function over `NonEmpty` list.
 
     map (\x -> x + 1) ( 1, [ 2, 3 ] )
     --> ( 2, [3, 4] )
@@ -286,7 +327,8 @@ map f ( h, t ) =
 
 
 {-| Some as `map` but an index is passed with each element.
-Index starts at 0
+
+Index starts at 0.
 
     indexedMap (\i x -> String.fromInt i ++ " is " ++ x) ("a", ["b", "c"])
     --> ("0 is a",["1 is b","2 is c"])
@@ -415,7 +457,7 @@ reverse ( h, t ) =
             ( nH, nT )
 
 
-{-| Figure out whether a list contains a value.
+{-| Figure out whether a `NonEmpty` list contains a value.
 
     member 2 ( 1, [ 2 ] )
     --> True
@@ -742,13 +784,6 @@ isSingleton ( _, t ) =
 
 
 
-{- Other function candidates:
-
-   * take
-   * drop
-   * partition
-   * unzip?
--}
 -- JSON functions
 
 
