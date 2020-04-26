@@ -1,4 +1,31 @@
-module List.NonEmpty.Zipper exposing (..)
+module List.NonEmpty.Zipper exposing
+    ( Zipper, singleton, fromNonEmpty, fromList, fromCons, custom
+    , toList, toNonEmpty
+    )
+
+{-|
+
+@docs Zipper, singleton, fromNonEmpty, fromList, fromCons, fromConsList, custom
+
+
+## Convert
+
+@docs toNonEmpty toList
+
+
+## Change
+
+
+### Insert without chaning focus
+
+@docs insertBefore, insertAfter
+
+
+### Insert and change focus
+
+@docs consBefore, consAfter
+
+-}
 
 import List.NonEmpty as NE exposing (NonEmpty)
 
@@ -25,14 +52,14 @@ fromList =
     Maybe.map fromNonEmpty << NE.fromList
 
 
-fromListCons : List a -> NonEmpty a -> Zipper a
-fromListCons p ( f, n ) =
-    Zipper (List.reverse p) f n
-
-
 fromCons : a -> List a -> Zipper a
 fromCons a =
     fromNonEmpty << NE.fromCons a
+
+
+fromConsList : List a -> NonEmpty a -> Zipper a
+fromConsList p ( f, n ) =
+    Zipper (List.reverse p) f n
 
 
 custom : List a -> a -> List a -> Zipper a
@@ -189,6 +216,10 @@ attemptByHelper step n acc =
 
             Nothing ->
                 acc
+
+
+
+-- Ends
 
 
 start : Zipper a -> Zipper a
