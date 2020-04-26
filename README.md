@@ -66,15 +66,15 @@ matchNonEmpty (h, t) =
 
 `List.NoneEmpty.NonEmpty` is:
 
-* [x] Functor
-* [x] Foldable
-* [x] Applicative
-* [x] Monad
-* [x] Comonad
+* Functor
+* Foldable
+* Applicative
+* Monad
+* Comonad
 
 `List.NonEmpty.Zipper` is:
 
-* [x] Functor
-* [x] Foldable
-* [x] Applicative
-* [x] Comonad
+* Functor
+* Foldable
+* Applicative
+* Comonad
