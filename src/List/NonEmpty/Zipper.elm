@@ -2,6 +2,14 @@ module List.NonEmpty.Zipper exposing (..)
 
 import List.NonEmpty as NE exposing (NonEmpty)
 
+{- Missing functions:
+
+* insert before
+* insert after
+* all (all focuses)
+* indexedMap
+
+-}
 
 {-| Zipper is opaque type because it
 copntains some internal semantic which we don't want to leak to a user
@@ -32,7 +40,7 @@ fromCons a =
 
 custom : List a -> a -> List a -> Zipper a
 custom p f n =
-    Zipper p f n
+    Zipper (List.reverse p) f n
 
 
 toNonEmpty : Zipper a -> NonEmpty a
