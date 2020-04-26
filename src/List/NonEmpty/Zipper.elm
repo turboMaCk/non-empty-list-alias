@@ -1,5 +1,5 @@
 module List.NonEmpty.Zipper exposing
-    ( Zipper, singleton, fromNonEmpty, fromList, fromCons, custom
+    ( Zipper, singleton, fromNonEmpty, fromList, fromCons, fromConsList, custom
     , insertBefore, insertAfter
     , consBefore, consAfter
     , current, listNext, listPrev, hasNext, hasPrev, length
@@ -21,10 +21,14 @@ module List.NonEmpty.Zipper exposing
 
 ## Insert without chaning focus
 
+This function insert value around focus without moving it.
+
 @docs insertBefore, insertAfter
 
 
 ## Insert and change focus
+
+These functions insert value around focus while moving focus on newly inserted value.
 
 @docs consBefore, consAfter
 
@@ -85,43 +89,125 @@ value in the end. These function simply move in circle and never reach the end o
 import List.NonEmpty as NE exposing (NonEmpty)
 
 
-{-| Zipper is opaque type because it
-copntains some internal semantic which we don't want to leak to a user
+{-| Zipper type.
+
+This can be thought of as `NonEmpty` which holds keeps track
+of unconsed data.
+
+Unlike `NonEmpty` this type is opaque as it needs to ensure
+internal invariants.
+
 -}
 type Zipper a
     = Zipper (List a) a (List a)
 
 
+{-| Put single value into a `Zipper`.
+
+    singleton "foo"
+    |> current
+    --> "foo"
+
+-}
 singleton : a -> Zipper a
 singleton a =
     Zipper [] a []
 
 
+{-| Init `Zipper` from `NonEmpty` list type.
+
+    fromNonEmpty ( 1, [ 2, 3 ] )
+    |> current
+    --> 1
+
+    fromNonEmpty ( 1, [ 2, 3 ] )
+    |> toList
+    --> [ 1, 2, 3 ]
+
+-}
 fromNonEmpty : NonEmpty a -> Zipper a
 fromNonEmpty ( h, t ) =
     Zipper [] h t
 
 
+{-| Init `Zipper` from `List`.
+This operation is not sucessfull for `[]`
+
+    fromList []
+    --> Nothing
+
+    fromList [1, 2, 3]
+    --> Just (custom [] 1 [2,3])
+
+-}
 fromList : List a -> Maybe (Zipper a)
 fromList =
     Maybe.map fromNonEmpty << NE.fromList
 
 
+{-| Init `Zipper` by consing value onto the list.
+
+    fromCons 1 [ 2, 3 ]
+    |> current
+    --> 1
+
+-}
 fromCons : a -> List a -> Zipper a
 fromCons a =
     fromNonEmpty << NE.fromCons a
 
 
+{-| Init `Zipper` by consing `List` onto `NonEmpty`.
+
+The head of NonEmpty stays in focus while list is a list
+of previous heads.
+
+    fromConsList [] (1, [2])
+    |> current
+    --> 1
+
+    fromConsList [1, 2] (3, [4])
+    |> prev
+    |> Maybe.map current
+    --> Just 2
+
+-}
 fromConsList : List a -> NonEmpty a -> Zipper a
 fromConsList p ( f, n ) =
     Zipper (List.reverse p) f n
 
 
+{-| Init `Zipper` from parts.
+
+    custom [1,2] 3 [4,5]
+    |> current
+    --> 3
+
+    custom [1,2] 3 [4,5]
+    |> prev
+    |> Maybe.map current
+    --> Just 2
+
+-}
 custom : List a -> a -> List a -> Zipper a
 custom p f n =
     Zipper (List.reverse p) f n
 
 
+{-| Convert `Zipper` back to `NonEmpty`.
+
+This function won't loose data, all previous heads are added back.
+
+    fromCons 1 [2,3]
+    |> toNonEmpty
+    --> (1, [2, 3])
+
+
+    fromConsList [1,2] (3, [4])
+    |> toNonEmpty
+    --> (1, [2,3,4])
+
+-}
 toNonEmpty : Zipper a -> NonEmpty a
 toNonEmpty (Zipper p f n) =
     case List.reverse p of
@@ -132,18 +218,55 @@ toNonEmpty (Zipper p f n) =
             ( h, t ++ f :: n )
 
 
+{-| Convert `Zipper` to `List`.
+
+singleton 1
+|> toList
+--> [1]
+
+custom [1,2] 3 []
+|> toList
+--> [1,2,3]
+
+-}
 toList : Zipper a -> List a
 toList =
     NE.toList << toNonEmpty
 
 
-inserBefore : a -> Zipper a -> Zipper a
-inserBefore a (Zipper b f n) =
+{-| Insert new item before current focus.
+
+    fromConsList [1, 2] (4, [5])
+    |> insertBefore 3
+    |> toList
+    --> [1,2,3,4,5]
+
+    fromConsList [1, 2] (4, [5])
+    |> insertBefore 3
+    |> current
+    --> 4
+
+-}
+insertBefore : a -> Zipper a -> Zipper a
+insertBefore a (Zipper b f n) =
     Zipper (a :: b) f n
 
 
-inserAfter : a -> Zipper a -> Zipper a
-inserAfter a (Zipper b f n) =
+{-| Insert new item after current focus.
+
+    fromConsList [1, 2] (3, [5])
+    |> insertAfter 4
+    |> toList
+    --> [1,2,3,4,5]
+
+    fromConsList [1, 2] (3, [5])
+    |> insertAfter 4
+    |> current
+    --> 3
+
+-}
+insertAfter : a -> Zipper a -> Zipper a
+insertAfter a (Zipper b f n) =
     Zipper b f (a :: n)
 
 
