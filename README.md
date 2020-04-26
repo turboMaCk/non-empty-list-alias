@@ -64,7 +64,7 @@ matchNonEmpty (h, t) =
 
 ## For Haskell Fanbois
 
-NonEmptyList is:
+`List.NoneEmpty.NonEmpty` is:
 
 * [x] Functor
 * [x] Foldable
@@ -72,7 +72,7 @@ NonEmptyList is:
 * [x] Monad
 * [x] Comonad
 
-List.NonEmpty.Zipper is:
+`List.NonEmpty.Zipper` is:
 
 * [x] Functor
 * [x] Foldable
