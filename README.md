@@ -27,7 +27,8 @@ This implementation uses different approach. `NonEmpty` is an alias on the pair 
 Relaying on anonymous data-type like tuple means:
 
 1. [Libraries](https://package.elm-lang.org/packages/elm-community/list-extra/latest/List-Extra#uncons) can produce `NonEmpty` data without depending on specific implementation
-1. Implementation provided by this package can be easily replaced by other implementation without breaking API due to types.
+1. Implementation provided by this package can be easily replaced by different implementation using same type.
+1. Users maye choose to work with tupple directly without need to tranform from and to `NonEmpty` type.
 
 ### Zipper
 
@@ -42,7 +43,7 @@ My favorite implementation of zipper which doesn't rely on `NonEmpty` is [zwilia
 
 ### Drawbacks
 
-Compare to other implementations this implementation has not descriptive constructor in value space.
+Compare to other implementations this implementation has less descriptive constructor in value space.
 This means that in pattern matching happens on pair instead of explicit constructor like `Cons` or `NonEmpty`.
 
 **conventional library:**
@@ -63,7 +64,7 @@ matchNonEmpty (h, t) =
 
 ## For Haskell Fanbois
 
-NonEmptyList is:
+`List.NoneEmpty.NonEmpty` is:
 
 * [x] Functor
 * [x] Foldable
@@ -71,7 +72,7 @@ NonEmptyList is:
 * [x] Monad
 * [x] Comonad
 
-List.NonEmpty.Zipper is:
+`List.NonEmpty.Zipper` is:
 
 * [x] Functor
 * [x] Foldable

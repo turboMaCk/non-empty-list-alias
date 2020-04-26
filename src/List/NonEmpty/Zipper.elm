@@ -25,6 +25,11 @@ fromList =
     Maybe.map fromNonEmpty << NE.fromList
 
 
+fromListCons : List a -> NonEmpty a -> Zipper a
+fromListCons p ( f, n ) =
+    Zipper (List.reverse p) f n
+
+
 fromCons : a -> List a -> Zipper a
 fromCons a =
     fromNonEmpty << NE.fromCons a
@@ -32,7 +37,7 @@ fromCons a =
 
 custom : List a -> a -> List a -> Zipper a
 custom p f n =
-    Zipper p f n
+    Zipper (List.reverse p) f n
 
 
 toNonEmpty : Zipper a -> NonEmpty a
@@ -48,6 +53,26 @@ toNonEmpty (Zipper p f n) =
 toList : Zipper a -> List a
 toList =
     NE.toList << toNonEmpty
+
+
+inserBefore : a -> Zipper a -> Zipper a
+inserBefore a (Zipper b f n) =
+    Zipper (a :: b) f n
+
+
+inserAfter : a -> Zipper a -> Zipper a
+inserAfter a (Zipper b f n) =
+    Zipper b f (a :: n)
+
+
+consBefore : a -> Zipper a -> Zipper a
+consBefore a (Zipper b f n) =
+    Zipper b a (f :: n)
+
+
+consAfter : a -> Zipper a -> Zipper a
+consAfter a (Zipper b f n) =
+    Zipper (f :: b) a n
 
 
 
@@ -166,6 +191,26 @@ attemptByHelper step n acc =
                 acc
 
 
+start : Zipper a -> Zipper a
+start =
+    toEndHelper prev
+
+
+end : Zipper a -> Zipper a
+end =
+    toEndHelper next
+
+
+toEndHelper : (a -> Maybe a) -> a -> a
+toEndHelper f acc =
+    case f acc of
+        Just val ->
+            toEndHelper f val
+
+        Nothing ->
+            acc
+
+
 
 -- Cycling
 
@@ -231,6 +276,22 @@ map fc (Zipper p f n) =
         List.map fc n
 
 
+relativeIndexedMap : (Int -> a -> b) -> Zipper a -> Zipper b
+relativeIndexedMap f (Zipper p focus n) =
+    Zipper (List.indexedMap (\i -> f (-1 * (1 + i))) p) (f 0 focus) <|
+        List.indexedMap (\i -> f (i + 1)) n
+
+
+absoluteIndexedMap : (Int -> a -> b) -> Zipper a -> Zipper b
+absoluteIndexedMap f (Zipper p focus n) =
+    let
+        prevLength =
+            List.length p
+    in
+    Zipper (List.indexedMap (\i -> f (prevLength - 1 - i)) p) (f prevLength focus) <|
+        List.indexedMap (\i -> f (prevLength + 1 + i)) n
+
+
 
 -- Foldable
 
@@ -291,6 +352,11 @@ maybeIter f acc a =
 
         Nothing ->
             List.reverse acc
+
+
+duplicateList : Zipper a -> List (Zipper a)
+duplicateList =
+    toList << duplicate
 
 
 genericMove : (a -> Maybe a) -> (a -> Maybe a) -> a -> Zipper a

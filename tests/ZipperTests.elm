@@ -154,3 +154,22 @@ applicativeTest =
                     |> Zipper.andMap simpleZipper
                     |> Expect.equal (Zipper.map ((*) 2) simpleZipper)
         ]
+
+
+toEnds : Test
+toEnds =
+    describe "rewind to ends" <|
+        [ test "rewind to start" <|
+            \() ->
+                Zipper.backward simpleZipper
+                    |> Zipper.start
+                    |> Expect.equal simpleZipper
+        , test "rewind to end" <|
+            \() ->
+                Zipper.end simpleZipper
+                    |> Expect.equal (Zipper.backward simpleZipper)
+        , test "rewind to end is same as attemptNext by length - 1" <|
+            \() ->
+                Zipper.attemptNextBy (Zipper.length simpleZipper - 1) simpleZipper
+                    |> Expect.equal (Zipper.end simpleZipper)
+        ]
