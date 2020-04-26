@@ -1,6 +1,14 @@
 module List.NonEmpty.Zipper exposing
     ( Zipper, singleton, fromNonEmpty, fromList, fromCons, custom
-    , toList, toNonEmpty
+    , insertBefore, insertAfter
+    , consBefore, consAfter
+    , current, listNext, listPrev, hasNext, hasPrev, length
+    , next, prev, nextBy, prevBy
+    , attemptNext, attemptPrev, attemptPrevBy, attemptNextBy
+    , start, end
+    , forward, backward, forwardBy, backwardBy
+    , map, relativeIndexedMap, absoluteIndexedMap, foldl, foldr, foldl1, foldr1, map2, andMap, duplicate, extend, duplicateList
+    , toNonEmpty, toList
     )
 
 {-|
@@ -8,22 +16,69 @@ module List.NonEmpty.Zipper exposing
 @docs Zipper, singleton, fromNonEmpty, fromList, fromCons, fromConsList, custom
 
 
-## Convert
-
-@docs toNonEmpty toList
+# Change
 
 
-## Change
-
-
-### Insert without chaning focus
+## Insert without chaning focus
 
 @docs insertBefore, insertAfter
 
 
-### Insert and change focus
+## Insert and change focus
 
 @docs consBefore, consAfter
+
+
+## Query
+
+Functions that query `Zipper` for additional data.
+
+@docs current, listNext, listPrev, hasNext, hasPrev, length
+
+
+# Movement
+
+Functions that move focus within `Zipper` around without losing data.
+
+
+## Bounded Movement
+
+These function will return `Nothing` when moving out of bounds of `Zipper`.
+
+@docs next, prev, nextBy, prevBy
+
+
+## Direction Movement
+
+These function will move in direction but won't reach out of bound.
+When end on any side is reached, the last value on this side is returned.
+
+@docs attemptNext, attemptPrev, attemptPrevBy, attemptNextBy
+
+
+## Bounds
+
+These helper function will move from either side of a `Zipper`
+
+@docs start, end
+
+
+## Cycling Movement
+
+These function move in cycles around the zipper. Value on a very start is preceeded by
+value in the end. These function simply move in circle and never reach the end of a `Zipper`.
+
+@docs forward, backward, forwardBy, backwardBy
+
+
+# Tranform
+
+@docs map, relativeIndexedMap, absoluteIndexedMap, foldl, foldr, foldl1, foldr1, map2, andMap, duplicate, extend, duplicateList
+
+
+# Convert
+
+@docs toNonEmpty, toList
 
 -}
 
