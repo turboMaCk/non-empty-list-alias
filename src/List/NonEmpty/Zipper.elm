@@ -1,8 +1,8 @@
 module List.NonEmpty.Zipper exposing
     ( Zipper, singleton, fromNonEmpty, fromList, fromCons, fromConsList, custom
+    , current, listPrev, listNext, hasPrev, hasNext, length
     , insertBefore, insertAfter
     , consBefore, consAfter
-    , current, listNext, listPrev, hasNext, hasPrev, length
     , next, prev, nextBy, prevBy
     , attemptNext, attemptPrev, attemptPrevBy, attemptNextBy
     , start, end
@@ -14,6 +14,13 @@ module List.NonEmpty.Zipper exposing
 {-|
 
 @docs Zipper, singleton, fromNonEmpty, fromList, fromCons, fromConsList, custom
+
+
+## Query
+
+Functions that query `Zipper` for additional data.
+
+@docs current, listPrev, listNext, hasPrev, hasNext, length
 
 
 # Change
@@ -31,13 +38,6 @@ This function insert value around focus without moving it.
 These functions insert value around focus while moving focus on newly inserted value.
 
 @docs consBefore, consAfter
-
-
-## Query
-
-Functions that query `Zipper` for additional data.
-
-@docs current, listNext, listPrev, hasNext, hasPrev, length
 
 
 # Movement
@@ -234,7 +234,7 @@ toList =
     NE.toList << toNonEmpty
 
 
-{-| Insert new item before current focus.
+{-| Insert new value before current focus.
 
     fromConsList [1, 2] (4, [5])
     |> insertBefore 3
@@ -252,7 +252,7 @@ insertBefore a (Zipper b f n) =
     Zipper (a :: b) f n
 
 
-{-| Insert new item after current focus.
+{-| Insert new value after current focus.
 
     fromConsList [1, 2] (3, [5])
     |> insertAfter 4
@@ -270,11 +270,37 @@ insertAfter a (Zipper b f n) =
     Zipper b f (a :: n)
 
 
+{-| Insert value before current focus and move focus to it.
+
+    fromConsList [1, 2] (4, [5])
+    |> consBefore 3
+    |> toList
+    --> [1,2,3,4,5]
+
+    fromConsList [1, 2] (4, [5])
+    |> consBefore 3
+    |> current
+    --> 3
+
+-}
 consBefore : a -> Zipper a -> Zipper a
 consBefore a (Zipper b f n) =
     Zipper b a (f :: n)
 
 
+{-| Insert new value after current focus and move focus to it.
+
+    fromConsList [1, 2] (3, [5])
+    |> consAfter 4
+    |> toList
+    --> [1,2,3,4,5]
+
+    fromConsList [1, 2] (3, [5])
+    |> consAfter 4
+    |> current
+    --> 4
+
+-}
 consAfter : a -> Zipper a -> Zipper a
 consAfter a (Zipper b f n) =
     Zipper (f :: b) a n
@@ -284,31 +310,81 @@ consAfter a (Zipper b f n) =
 -- Query
 
 
+{-| Get current focus
+
+    custom [1,2] 3 [4,5]
+    |> current
+    --> 3
+
+-}
 current : Zipper a -> a
 current (Zipper _ focus _) =
     focus
 
 
+{-| Get `List` of all values following current focus.
+
+    custom [1,2] 3 [4,5]
+    |> listNext
+    --> [4,5]
+
+-}
 listNext : Zipper a -> List a
 listNext (Zipper _ _ n) =
     n
 
 
+{-| Get `List` of all values preceding current focus.
+
+    custom [1,2] 3 [4,5]
+    |> listPrev
+    --> [1,2]
+
+-}
 listPrev : Zipper a -> List a
 listPrev (Zipper p _ _) =
     List.reverse p
 
 
+{-| Check if there is next value after current focus.
+
+    custom [1,2] 3 [4,5]
+    |> hasNext
+    --> True
+
+    custom [1,2] 3 []
+    |> hasNext
+    --> False
+
+-}
 hasNext : Zipper a -> Bool
 hasNext (Zipper _ _ n) =
     not <| List.isEmpty n
 
 
+{-| Check if there is next value before current focus.
+
+    custom [1,2] 3 [4,5]
+    |> hasPrev
+    --> True
+
+    custom [] 1 [2,3]
+    |> hasPrev
+    --> False
+
+-}
 hasPrev : Zipper a -> Bool
 hasPrev (Zipper p _ _) =
     not <| List.isEmpty p
 
 
+{-| Get length of Zipper
+
+    custom [1,2] 3 [4]
+    |> length
+    --> 4
+
+-}
 length : Zipper a -> Int
 length (Zipper p _ n) =
     List.length p + List.length n + 1
@@ -318,6 +394,18 @@ length (Zipper p _ n) =
 -- Movement
 
 
+{-| Move focus to next value.
+
+    custom [] 1 [2,3]
+    |> next
+    |> Maybe.map current
+    |> Just 2
+
+    custom [] 1 []
+    |> next
+    --> Nothing
+
+-}
 next : Zipper a -> Maybe (Zipper a)
 next (Zipper p f n) =
     case n of
@@ -328,6 +416,18 @@ next (Zipper p f n) =
             Just <| Zipper (f :: p) h t
 
 
+{-| Move focus to next value.
+
+    custom [1, 2] 3 []
+    |> prev
+    |> Maybe.map current
+    |> Just 2
+
+    custom [] 1 []
+    |> prev
+    --> Nothing
+
+-}
 prev : Zipper a -> Maybe (Zipper a)
 prev (Zipper p f n) =
     case p of
