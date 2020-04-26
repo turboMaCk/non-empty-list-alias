@@ -23,7 +23,9 @@ Functions that query `Zipper` for additional data.
 @docs current, listPrev, listNext, hasPrev, hasNext, length
 
 
-# Change
+# Insert new values
+
+Following function inserts new value into existing `Zipper`.
 
 
 ## Insert without chaning focus
@@ -220,13 +222,13 @@ toNonEmpty (Zipper p f n) =
 
 {-| Convert `Zipper` to `List`.
 
-singleton 1
-|> toList
---> [1]
+    singleton 1
+    |> toList
+    --> [1]
 
-custom [1,2] 3 []
-|> toList
---> [1,2,3]
+    custom [1,2] 3 []
+    |> toList
+    --> [1,2,3]
 
 -}
 toList : Zipper a -> List a
@@ -438,21 +440,51 @@ prev (Zipper p f n) =
             Just <| Zipper t h <| f :: n
 
 
+{-| Move focus to next value if such value exists.
+
+    custom [] 1 [2,3]
+    |> attemptNext
+    |> current
+    |> 2
+
+    custom [] 1 []
+    |> attemptNext
+    |> current
+    --> 1
+
+-}
 attemptNext : Zipper a -> Zipper a
 attemptNext zipper =
     Maybe.withDefault zipper <| next zipper
 
 
+{-| Move focus to previous value if such value exists.
+
+    custom [1] 2 [3]
+    |> attemptPrev
+    |> current
+    |> 1
+
+    custom [] 1 []
+    |> attemptPrev
+    |> current
+    --> 1
+
+-}
 attemptPrev : Zipper a -> Zipper a
 attemptPrev zipper =
     Maybe.withDefault zipper <| prev zipper
 
 
+{-| Perform [`next`](#next) n times.
+-}
 nextBy : Int -> Zipper a -> Maybe (Zipper a)
 nextBy =
     byMaybeHelper next
 
 
+{-| Perform [`prev`](#prev) n times.
+-}
 prevBy : Int -> Zipper a -> Maybe (Zipper a)
 prevBy =
     byMaybeHelper prev
@@ -472,11 +504,15 @@ byMaybeHelper step n acc =
                 Nothing
 
 
+{-| Perform [`attemptNext`](#attemptNext) n times.
+-}
 attemptNextBy : Int -> Zipper a -> Zipper a
 attemptNextBy =
     attemptByHelper next
 
 
+{-| Perform [`attemptPrev`](#attemptPrev) n times.
+-}
 attemptPrevBy : Int -> Zipper a -> Zipper a
 attemptPrevBy =
     attemptByHelper prev
@@ -500,11 +536,27 @@ attemptByHelper step n acc =
 -- Ends
 
 
+{-| Move focus to the very first value
+
+    custom [ 1, 2, 3 ] 4 [ 5, 6, 7 ]
+    |> start
+    |> current
+    --> 1
+
+-}
 start : Zipper a -> Zipper a
 start =
     toEndHelper prev
 
 
+{-| Move focus to the very last value
+
+    custom [ 1, 2, 3 ] 4 [ 5, 6, 7 ]
+    |> end
+    |> current
+    --> 7
+
+-}
 end : Zipper a -> Zipper a
 end =
     toEndHelper next
@@ -524,6 +576,19 @@ toEndHelper f acc =
 -- Cycling
 
 
+{-| Move focus to next value, go back to fist value if current value is last.
+
+    custom [] 1 [2,3]
+    |> forward
+    |> current
+    |> 2
+
+    custom [1,2] 3 []
+    |> forward
+    |> current
+    --> 1
+
+-}
 forward : Zipper a -> Zipper a
 forward (Zipper p f n) =
     case n of
@@ -540,6 +605,19 @@ forward (Zipper p f n) =
             Zipper (f :: p) h t
 
 
+{-| Move focus to previous value, go to last value if current value is fist one.
+
+    custom [1, 2] 3 []
+    |> backward
+    |> current
+    |> 2
+
+    custom [] 1 [2,3]
+    |> backward
+    |> current
+    --> 3
+
+-}
 backward : Zipper a -> Zipper a
 backward (Zipper p f n) =
     case p of
@@ -556,11 +634,15 @@ backward (Zipper p f n) =
             Zipper t h <| f :: n
 
 
+{-| Move [`forward`]{#forward} n times.
+-}
 forwardBy : Int -> Zipper a -> Zipper a
 forwardBy =
     rewindByHelper forward
 
 
+{-| Move [`backward`]{#backward} n times.
+-}
 backwardBy : Int -> Zipper a -> Zipper a
 backwardBy =
     rewindByHelper backward
@@ -579,18 +661,21 @@ rewindByHelper step n acc =
 -- Functor
 
 
+{-| -}
 map : (a -> b) -> Zipper a -> Zipper b
 map fc (Zipper p f n) =
     Zipper (List.map fc p) (fc f) <|
         List.map fc n
 
 
+{-| -}
 relativeIndexedMap : (Int -> a -> b) -> Zipper a -> Zipper b
 relativeIndexedMap f (Zipper p focus n) =
     Zipper (List.indexedMap (\i -> f (-1 * (1 + i))) p) (f 0 focus) <|
         List.indexedMap (\i -> f (i + 1)) n
 
 
+{-| -}
 absoluteIndexedMap : (Int -> a -> b) -> Zipper a -> Zipper b
 absoluteIndexedMap f (Zipper p focus n) =
     let
@@ -605,21 +690,25 @@ absoluteIndexedMap f (Zipper p focus n) =
 -- Foldable
 
 
+{-| -}
 foldl : (a -> b -> b) -> b -> Zipper a -> b
 foldl f acc =
     NE.foldl f acc << toNonEmpty
 
 
+{-| -}
 foldl1 : (a -> a -> a) -> Zipper a -> a
 foldl1 f =
     NE.foldr1 f << toNonEmpty
 
 
+{-| -}
 foldr : (a -> b -> b) -> b -> Zipper a -> b
 foldr f acc =
     NE.foldr f acc << toNonEmpty
 
 
+{-| -}
 foldr1 : (a -> a -> a) -> Zipper a -> a
 foldr1 f =
     NE.foldr1 f << toNonEmpty
@@ -629,11 +718,13 @@ foldr1 f =
 -- Applicative
 
 
+{-| -}
 map2 : (a -> b -> c) -> Zipper a -> Zipper b -> Zipper c
 map2 f (Zipper p1 f1 n1) (Zipper p2 f2 n2) =
     Zipper (List.map2 f p1 p2) (f f1 f2) (List.map2 f n1 n2)
 
 
+{-| -}
 andMap : Zipper a -> Zipper (a -> b) -> Zipper b
 andMap =
     map2 (|>)
@@ -643,16 +734,19 @@ andMap =
 -- Comonad
 
 
+{-| -}
 duplicate : Zipper a -> Zipper (Zipper a)
 duplicate =
     genericMove prev next
 
 
+{-| -}
 extend : (Zipper a -> b) -> Zipper a -> Zipper b
 extend f =
     map f << duplicate
 
 
+{-| -}
 maybeIter : (a -> Maybe a) -> List a -> a -> List a
 maybeIter f acc a =
     case f a of
@@ -663,6 +757,7 @@ maybeIter f acc a =
             List.reverse acc
 
 
+{-| -}
 duplicateList : Zipper a -> List (Zipper a)
 duplicateList =
     toList << duplicate
