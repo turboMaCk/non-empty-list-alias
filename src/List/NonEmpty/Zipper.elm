@@ -62,7 +62,7 @@ inserBefore a (Zipper b f n) =
 
 inserAfter : a -> Zipper a -> Zipper a
 inserAfter a (Zipper b f n) =
-    Zipper a f (a :: n)
+    Zipper b f (a :: n)
 
 
 consBefore : a -> Zipper a -> Zipper a
