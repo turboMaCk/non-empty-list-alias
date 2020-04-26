@@ -43,7 +43,7 @@ My favorite implementation of zipper which doesn't rely on `NonEmpty` is [zwilia
 
 ### Drawbacks
 
-Compare to other implementations this implementation has not descriptive constructor in value space.
+Compare to other implementations this implementation has less descriptive constructor in value space.
 This means that in pattern matching happens on pair instead of explicit constructor like `Cons` or `NonEmpty`.
 
 **conventional library:**
