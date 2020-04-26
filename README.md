@@ -27,7 +27,8 @@ This implementation uses different approach. `NonEmpty` is an alias on the pair 
 Relaying on anonymous data-type like tuple means:
 
 1. [Libraries](https://package.elm-lang.org/packages/elm-community/list-extra/latest/List-Extra#uncons) can produce `NonEmpty` data without depending on specific implementation
-1. Implementation provided by this package can be easily replaced by other implementation without breaking API due to types.
+1. Implementation provided by this package can be easily replaced by different implementation using same type.
+1. Users maye choose to work with tupple directly without need to tranform from and to `NonEmpty` type.
 
 ### Zipper
 
