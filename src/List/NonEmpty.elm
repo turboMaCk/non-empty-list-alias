@@ -180,7 +180,7 @@ toList ( h, t ) =
     h :: t
 
 
-{-| Add element to the begining of `NonEmpty`.
+{-| Add element to the begining of `NonEmpty` list.
 
     cons 2 ( 1, [] )
     --> (2, [ 1 ])
@@ -191,7 +191,7 @@ cons a ( h, t ) =
     ( a, h :: t )
 
 
-{-| Remove first element form `NonEmptylist`.
+{-| Remove first element form `NonEmpty` list.
 
     uncons ( 3, [ 2, 1 ] )
     --> ( 3, Just ( 2, [ 1 ] ) )
@@ -274,7 +274,7 @@ take n ( h, t ) =
     ( h, List.take (n - 1) t )
 
 
-{-| Removes first element of the `NonEmpty`.
+{-| Removes first element of the `NonEmpty` list.
 
     dropHead ( 1, [ 2 ] )
     --> Just (2, [])
@@ -288,7 +288,7 @@ dropHead ( _, t ) =
     fromList t
 
 
-{-| Drop first n elements of `NonEmpty`.
+{-| Drop first n elements of `NonEmpty` list.
 
     drop 2 ( 1, [ 2, 3, 4 ] )
     --> Just ( 3, [4] )
@@ -339,7 +339,7 @@ indexedMap f ( h, t ) =
     ( f 0 h, List.indexedMap (\i -> f (i + 1)) t )
 
 
-{-| Reduce `NonEmpty` from left
+{-| Reduce `NonEmpty` from left.
 
     foldl (+) 0 (1, [2,3,4])
     --> 10
@@ -367,7 +367,7 @@ foldl1 f ( h, t ) =
     List.foldl f h t
 
 
-{-| Reduce `NonEmpty` from right
+{-| Reduce `NonEmpty` from right.
 
     foldr (+) 0 (1, [2,3,4])
     --> 10
@@ -381,7 +381,7 @@ foldr f acc =
     List.foldr f acc << toList
 
 
-{-| Collapse `NonEmpty a` into `a` value from right
+{-| Collapse `NonEmpty a` into `a` value from right.
 
     foldr1 (+) (1, [2,3,4])
     --> 10
@@ -409,7 +409,7 @@ filter f =
     fromList << List.filter f << toList
 
 
-{-| Filter out value that resolve to `Nothing`
+{-| Filter out value that resolve to `Nothing`.
 
     filterMap String.toInt ("1", ["baz", "3rd", "4"])
     --> Just (1, [4])
@@ -427,7 +427,7 @@ filterMap f =
 --
 
 
-{-| Calculate leght of `NonEmpty`
+{-| Calculate length of `NonEmpty` list.
 
     length ( 1, [ 2, 3 ] )
     --> 3
@@ -441,7 +441,7 @@ length ( _, t ) =
     List.length t + 1
 
 
-{-| Reverse `NonEmpty`
+{-| Reverse `NonEmpty` list.
 
     reverse (1, [2, 3, 4])
     --> (4, [3, 2, 1])
@@ -577,7 +577,7 @@ append ne1 ne2 =
             foldr cons ne2 ne1
 
 
-{-| Concatenate a bunch of lists into a single list:
+{-| Concatenate a bunch of lists into a single list.
 
     concat ((1, [2, 3]), [(4, [5, 6]), (7, [8]), (9, []), (10, [11])])
     --> (1,[2,3,4,5,6,7,8,9,10,11])
@@ -609,7 +609,7 @@ concatMap f =
     concat << map f
 
 
-{-| Create `NonEmpty` containing sub `NoneEmptyList`s.
+{-| Create `NonEmpty` containing sub `NoneEmpty` lists.
 
 This is a more advanced function following [`Comonad`](https://hackage.haskell.org/package/comonad)
 
@@ -617,7 +617,7 @@ This is a more advanced function following [`Comonad`](https://hackage.haskell.o
     --> ( ( 1, [ 2, 3 ] ), [ ( 2, [ 3 ] ), ( 3, [] ) ] )
 
     duplicate ( "alone", [] )
-    --> ( ( "alone", [] ), [  ] )
+    --> ( ( "alone", [] ), [] )
 
 -}
 duplicate : NonEmpty a -> NonEmpty (NonEmpty a)
@@ -642,7 +642,7 @@ duplicateHelper acc (( _, t ) as ne) =
             duplicateHelper (ne :: acc) newNE
 
 
-{-| Take sub `NonEmpty` for each part of `NoneEmptyList` to generate new `NonEmpty`
+{-| Map value to a new value based on tail of a list.
 
 This is a more advanced function following [`Comonad`](https://hackage.haskell.org/package/comonad)
 
@@ -682,8 +682,8 @@ intersperse x ne =
             ( h, x :: List.intersperse x t )
 
 
-{-| Combine two lists with a given function
-In case where one of the two lists is longer the extra elements are ignored
+{-| Combine two lists with a given function.
+In case where one of the two lists is longer the extra elements are ignored.
 
     map2 (+) ( 1, [ 2 ] ) ( 1, [ 1 ] )
     --> (2, [3])
@@ -703,7 +703,7 @@ map2 f ( h1, t1 ) ( h2, t2 ) =
     ( f h1 h2, List.map2 f t1 t2 )
 
 
-{-| Map over number of nonempty lists
+{-| Map over multiple `NonEmpty` lists.
 
     map (+) (1, [2])
     |> andMap (1, [1])
@@ -740,7 +740,7 @@ sortHelper f ne =
             ne
 
 
-{-| Sort values from lowest to highest
+{-| Sort values from lowest to highest.
 
     sort ( 3, [ 4, 1, 2 ] )
     --> (1, [2, 3, 4])
@@ -769,7 +769,7 @@ sortWith f =
     sortHelper (List.sortWith f)
 
 
-{-| is the nonempty list exactly one element?
+{-| Is the nonempty list exactly one element?
 
     isSingleton ( 1, [] )
     --> True
@@ -797,7 +797,7 @@ decodeListHelper xs =
             Decode.fail "Expecting at least ONE ELEMENT array"
 
 
-{-| Decode JSON array to `NonEmpty`
+{-| Decode JSON array to `NonEmpty`.
 
     import Json.Decode as JD exposing (Decoder)
     import Json.Encode as JE
@@ -824,7 +824,7 @@ decodeList decoder =
         |> Decode.andThen decodeListHelper
 
 
-{-| Helper for creating custom `Decoder`
+{-| Helper for creating custom `Decoder`.
 
     import Json.Decode as JD exposing (Decoder)
     import Json.Encode as JE

@@ -7,7 +7,9 @@ module List.NonEmpty.Zipper exposing
     , attemptNext, attemptPrev, attemptPrevBy, attemptNextBy
     , start, end
     , forward, backward, forwardBy, backwardBy
-    , map, relativeIndexedMap, absoluteIndexedMap, foldl, foldr, foldl1, foldr1, map2, andMap, duplicate, extend, duplicateList
+    , map, relativeIndexedMap, absoluteIndexedMap, foldl, foldr, foldl1, foldr1
+    , map2, andMap
+    , duplicate, extend, duplicateList
     , toNonEmpty, toList
     )
 
@@ -79,7 +81,17 @@ value in the end. These function simply move in circle and never reach the end o
 
 # Tranform
 
-@docs map, relativeIndexedMap, absoluteIndexedMap, foldl, foldr, foldl1, foldr1, map2, andMap, duplicate, extend, duplicateList
+@docs map, relativeIndexedMap, absoluteIndexedMap, foldl, foldr, foldl1, foldr1
+
+
+# Conbine
+
+@docs map2, andMap
+
+
+# Expand
+
+@docs duplicate, extend, duplicateList
 
 
 # Convert
@@ -761,7 +773,7 @@ foldr1 f =
 -- Applicative
 
 
-{-| Combine two Zippers with a given function
+{-| Combine two Zippers with a given function.
 In case where one of the two zippers is longer the extra elements are ignored
 
     map2 (+) (custom [1] 2 []) (custom [1] 1 [])
@@ -778,7 +790,7 @@ map2 f (Zipper p1 f1 n1) (Zipper p2 f2 n2) =
     Zipper (List.map2 f p1 p2) (f f1 f2) (List.map2 f n1 n2)
 
 
-{-| Map over number of Zippers
+{-| Map over multiple Zippers.
 
     map (+) (custom [1] 2 [3])
     |> andMap (custom [1] 2 [3])
@@ -795,21 +807,46 @@ andMap =
 -- Comonad
 
 
-{-| Comonadic duplicate
+{-| Create `Zipper` containing all possible variants of given Zipper.
+Current version is focused one.
+
+    custom [1] 2 [3]
+    |> duplicate
+    |> current
+    --> custom [1] 2 [3]
+
+
+    custom [1] 2 [3]
+    |> duplicate
+    |> forward
+    |> current
+    --> custom [1, 2] 3 []
+
 -}
 duplicate : Zipper a -> Zipper (Zipper a)
 duplicate =
     genericMove prev next
 
 
-{-| Comomadic extend
+{-| Map value to a new value based on surrounding structure.
+
+This is a more advanced function following [`Comonad`](https://hackage.haskell.org/package/comonad)
+
+    -- negate all True values which next value is not True itself
+    fromNonEmpty ( True, [ True, True, False, True, True ] )
+    |> extend (\zipper ->
+                      let prev = current <| backward zipper
+                      in prev && current zipper
+                 )
+    |> toNonEmpty
+    --> (True, [True, True, False, False, True])
+
 -}
 extend : (Zipper a -> b) -> Zipper a -> Zipper b
 extend f =
     map f << duplicate
 
 
-{-| -}
 maybeIter : (a -> Maybe a) -> List a -> a -> List a
 maybeIter f acc a =
     case f a of
@@ -820,7 +857,10 @@ maybeIter f acc a =
             List.reverse acc
 
 
-{-| Comonadic duplicate resulting in List
+{-| [`duplicate`](#duplicate) and covert to List.
+
+This function might be useful in view code.
+
 -}
 duplicateList : Zipper a -> List (Zipper a)
 duplicateList =
