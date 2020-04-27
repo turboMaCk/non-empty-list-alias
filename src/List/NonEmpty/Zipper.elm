@@ -646,14 +646,14 @@ backward (Zipper p f n) =
             Zipper t h <| f :: n
 
 
-{-| Move [`forward`]{#forward} n times.
+{-| Move [`forward`](#forward) n times.
 -}
 forwardBy : Int -> Zipper a -> Zipper a
 forwardBy =
     rewindByHelper forward
 
 
-{-| Move [`backward`]{#backward} n times.
+{-| Move [`backward`](#backward) n times.
 -}
 backwardBy : Int -> Zipper a -> Zipper a
 backwardBy =
