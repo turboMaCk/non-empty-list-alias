@@ -7,7 +7,7 @@ module List.NonEmpty exposing
     , sort, sortBy, sortWith
     , isSingleton, head, tail, take, dropHead, drop, uncons, toList
     , duplicate, extend
-    , decodeList, decode
+    , decodeList, decode, encodeList
     )
 
 {-|
@@ -52,11 +52,12 @@ module List.NonEmpty exposing
 
 # JSON
 
-@docs decodeList, decode
+@docs decodeList, decode, encodeList
 
 -}
 
 import Json.Decode as Decode exposing (Decoder)
+import Json.Encode as Encode exposing (Value)
 
 
 {-| `NonEmpty` list is represented
@@ -866,3 +867,10 @@ decodeList decoder =
 decode : Decoder (a -> List a -> NonEmpty a)
 decode =
     Decode.succeed fromCons
+
+
+{-| Encode `NonEmpty` as JSON array.
+-}
+encodeList : (a -> Value) -> NonEmpty a -> Value
+encodeList f =
+    Encode.list f << toList

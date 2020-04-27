@@ -39,6 +39,7 @@ One of the areas where downside of current approaches is already noticeable is w
 * [yotamDvir/elm-pivot](https://package.elm-lang.org/packages/yotamDvir/elm-pivot/latest/Pivot)
 
 All of which are usually constructed using `List a -> Maybe (Zipper a)` instead of `NonEmpty a -> Zipper a`.
+The motivation behind including `Zipper` is to encourage it's usage together with `NonEmpty` list.
 My favorite implementation of zipper which doesn't rely on `NonEmpty` is [zwilias/elm-holey-zipper](https://package.elm-lang.org/packages/zwilias/elm-holey-zipper/latest).
 
 ### Drawbacks
