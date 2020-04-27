@@ -506,14 +506,10 @@ any f ( h, t ) =
 
 -}
 maximum : NonEmpty comparable -> comparable
-maximum ( h, t ) =
-    case List.maximum t of
+maximum (( h, _ ) as ne) =
+    case List.maximum <| toList ne of
         Just x ->
-            if x > h then
-                x
-
-            else
-                h
+            x
 
         Nothing ->
             h
@@ -526,14 +522,10 @@ maximum ( h, t ) =
 
 -}
 minimum : NonEmpty comparable -> comparable
-minimum ( h, t ) =
-    case List.minimum t of
+minimum (( h, _ ) as ne) =
+    case List.minimum <| toList ne of
         Just x ->
-            if x < h then
-                x
-
-            else
-                h
+            x
 
         Nothing ->
             h
