@@ -661,21 +661,41 @@ rewindByHelper step n acc =
 -- Functor
 
 
-{-| -}
+{-| Map a function over Zipper
+
+    map (\x -> x + 1) (custom [1] 2 [3, 4])
+    |> toList
+    --> [2, 3, 4, 5]
+
+-}
 map : (a -> b) -> Zipper a -> Zipper b
 map fc (Zipper p f n) =
     Zipper (List.map fc p) (fc f) <|
         List.map fc n
 
 
-{-| -}
+{-| Indexed map relative to the position in the zipper.
+
+    custom ["a", "b"] "c" ["d"]
+    |> relativeIndexedMap (\index el -> (index, el))
+    |> toList
+    --> [(-2,"a"),(-1,"b"), (0,"c"), (1,"d")]
+
+-}
 relativeIndexedMap : (Int -> a -> b) -> Zipper a -> Zipper b
 relativeIndexedMap f (Zipper p focus n) =
     Zipper (List.indexedMap (\i -> f (-1 * (1 + i))) p) (f 0 focus) <|
         List.indexedMap (\i -> f (i + 1)) n
 
 
-{-| -}
+{-| Indexed map. Starting with 0 from the beginning of the zipper
+
+    custom ["a", "b"] "c" ["d"]
+    |> absoluteIndexedMap (\index el -> (index, el))
+    |> toList
+    --> [(0,"a"),(1,"b"), (2,"c"), (3,"d")]
+
+-}
 absoluteIndexedMap : (Int -> a -> b) -> Zipper a -> Zipper b
 absoluteIndexedMap f (Zipper p focus n) =
     let
@@ -690,25 +710,48 @@ absoluteIndexedMap f (Zipper p focus n) =
 -- Foldable
 
 
-{-| -}
+{-| Recude `Zipper` from left
+
+    foldl (+) 0 <| custom [1,2] 3 [4]
+    --> 10
+
+-}
 foldl : (a -> b -> b) -> b -> Zipper a -> b
 foldl f acc =
     NE.foldl f acc << toNonEmpty
 
 
-{-| -}
+{-| Collapse `Zipper a` into `a` value from left
+
+    foldl1 (++) <| custom ["hello"] " " ["world"]
+    --> "world hello"
+
+-}
 foldl1 : (a -> a -> a) -> Zipper a -> a
 foldl1 f =
-    NE.foldr1 f << toNonEmpty
+    NE.foldl1 f << toNonEmpty
 
 
-{-| -}
+{-| Reduce `Zipper` from right
+
+    foldr (+) 0 <| custom [1,2] 3 [4]
+    --> 10
+
+-}
 foldr : (a -> b -> b) -> b -> Zipper a -> b
 foldr f acc =
     NE.foldr f acc << toNonEmpty
 
 
-{-| -}
+{-| Collapse `Zipper a` into `a` value from right
+
+    foldr1 (+) (custom [1,2] 3 [4])
+    --> 10
+
+    foldr1 (++) (custom ["hello"] " " ["world"])
+    --> "hello world"
+
+-}
 foldr1 : (a -> a -> a) -> Zipper a -> a
 foldr1 f =
     NE.foldr1 f << toNonEmpty
@@ -718,13 +761,31 @@ foldr1 f =
 -- Applicative
 
 
-{-| -}
+{-| Combine two Zippers with a given function
+In case where one of the two zippers is longer the extra elements are ignored
+
+    map2 (+) (custom [1] 2 []) (custom [1] 1 [])
+    |> toList
+    --> [2, 3]
+
+    map2 (+) (custom [1] 2 [3]) (custom [1] 1 [])
+    |> toList
+    --> [2, 3]
+
+-}
 map2 : (a -> b -> c) -> Zipper a -> Zipper b -> Zipper c
 map2 f (Zipper p1 f1 n1) (Zipper p2 f2 n2) =
     Zipper (List.map2 f p1 p2) (f f1 f2) (List.map2 f n1 n2)
 
 
-{-| -}
+{-| Map over number of Zippers
+
+    map (+) (custom [1] 2 [3])
+    |> andMap (custom [1] 2 [3])
+    |> toList
+    --> [2, 4, 6]
+
+-}
 andMap : Zipper a -> Zipper (a -> b) -> Zipper b
 andMap =
     map2 (|>)
@@ -734,13 +795,15 @@ andMap =
 -- Comonad
 
 
-{-| -}
+{-| Comonadic duplicate
+-}
 duplicate : Zipper a -> Zipper (Zipper a)
 duplicate =
     genericMove prev next
 
 
-{-| -}
+{-| Comomadic extend
+-}
 extend : (Zipper a -> b) -> Zipper a -> Zipper b
 extend f =
     map f << duplicate
@@ -757,7 +820,8 @@ maybeIter f acc a =
             List.reverse acc
 
 
-{-| -}
+{-| Comonadic duplicate resulting in List
+-}
 duplicateList : Zipper a -> List (Zipper a)
 duplicateList =
     toList << duplicate
