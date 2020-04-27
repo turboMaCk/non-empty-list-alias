@@ -663,9 +663,9 @@ rewindByHelper step n acc =
 
 {-| Map a function over Zipper
 
-    map (\x -> x + 1) (custom [1] 2 [3, 4])
+    map String.fromInt (custom [1] 2 [3, 4])
     |> toList
-    --> [2, 3, 4, 5]
+    --> ["1", "2", "3", "4"]
 
 -}
 map : (a -> b) -> Zipper a -> Zipper b
