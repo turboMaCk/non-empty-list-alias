@@ -12,14 +12,14 @@ includes variety of practical functions like Json decoder as well as high level 
 
 ## Motivation
 
-[elm/core](https://package.elm-lang.org/packages/elm/core/latest/) doesn't come with any sort of `NoneEmptyList` type.
+[elm/core](https://package.elm-lang.org/packages/elm/core/latest/) doesn't come with any sort of `NonEmptyList` type.
 This means one usually has to rely on one of the user implementations on `NonEmpty` type:
 
 * [mgold/elm-nonempty-list](https://package.elm-lang.org/packages/mgold/elm-nonempty-list/latest/)
 * [hrldcpr/elm-cons](https://package.elm-lang.org/packages/hrldcpr/elm-cons/latest/)
 
 These implementations usually define custom type like `NonEmpty a = Cons a (List a)` and expose the constructor
-to make pattern matching possible. Anyway this makes it hard for library authors to provide
+to make pattern matching possible. This makes it hard for library authors to provide
 support for `NonEmpty` because they would need to pick one of these libraries and use it as a dependency
 of their own implementation and essentially impose this decision on their users.
 
