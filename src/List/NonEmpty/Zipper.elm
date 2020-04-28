@@ -30,7 +30,7 @@ Functions that query `Zipper` for additional data.
 Following function inserts new value into existing `Zipper`.
 
 
-## Insert without chaning focus
+## Insert without chaining focus
 
 This function insert value around focus without moving it.
 
@@ -73,18 +73,18 @@ These helper function will move from either side of a `Zipper`
 
 ## Cycling Movement
 
-These function move in cycles around the zipper. Value on a very start is preceeded by
+These function move in cycles around the zipper. Value on a very start is preceded by
 value in the end. These function simply move in circle and never reach the end of a `Zipper`.
 
 @docs forward, backward, forwardBy, backwardBy
 
 
-# Tranform
+# Transform
 
 @docs map, relativeIndexedMap, absoluteIndexedMap, foldl, foldr, foldl1, foldr1
 
 
-# Conbine
+# Combine
 
 @docs map2, andMap
 
@@ -145,7 +145,7 @@ fromNonEmpty ( h, t ) =
 
 
 {-| Init `Zipper` from `List`.
-This operation is not sucessfull for `[]`
+This operation is not successful for `[]`
 
     fromList []
     --> Nothing
@@ -722,7 +722,7 @@ absoluteIndexedMap f (Zipper p focus n) =
 -- Foldable
 
 
-{-| Recude `Zipper` from left
+{-| Reduce `Zipper` from left
 
     foldl (+) 0 <| custom [1,2] 3 [4]
     --> 10

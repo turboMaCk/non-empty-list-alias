@@ -1,7 +1,7 @@
 {
     "type": "package",
     "name": "turboMaCk/non-empty-list-alias",
-    "summary": "Functions for working (a, List a) and NonEpty List Zipper",
+    "summary": "Functions for working (a, List a) and NonEmpty List Zipper",
     "license": "BSD-3-Clause",
     "version": "1.0.0",
     "exposed-modules": [
