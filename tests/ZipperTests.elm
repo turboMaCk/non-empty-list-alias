@@ -1,7 +1,5 @@
 module ZipperTests exposing (..)
 
--- import Fuzz exposing (Fuzzer, int, list, string)
-
 import Expect exposing (Expectation)
 import List.NonEmpty.Zipper as Zipper exposing (Zipper)
 import Test exposing (..)
@@ -14,8 +12,8 @@ simpleZipper =
         |> Zipper.fromNonEmpty
 
 
-queringTest : Test
-queringTest =
+queryingTest : Test
+queryingTest =
     describe "querying"
         [ test "get current at first" <|
             \() ->
@@ -61,7 +59,7 @@ movementTest =
                 Zipper.nextBy 5 simpleZipper
                     |> Maybe.map Zipper.current
                     |> Expect.equal (Just 5)
-        , test "nextBy more than leght returns Nothing" <|
+        , test "nextBy more than length returns Nothing" <|
             \() ->
                 Zipper.nextBy 10 simpleZipper
                     |> Expect.equal Nothing
@@ -114,7 +112,7 @@ cycleTest =
                 Zipper.backward simpleZipper
                     |> Zipper.current
                     |> Expect.equal 9
-        , test "forwardBy length on first returns to begining" <|
+        , test "forwardBy length on first returns to beginning" <|
             \() ->
                 Zipper.forwardBy (Zipper.length simpleZipper) simpleZipper
                     |> Expect.equal simpleZipper
@@ -134,7 +132,7 @@ cycleTest =
 comonadTest : Test
 comonadTest =
     describe "comonad"
-        [ test "extend curret is identity" <|
+        [ test "extend current is identity" <|
             \() ->
                 Zipper.extend Zipper.current simpleZipper
                     |> Expect.equal simpleZipper
@@ -148,7 +146,7 @@ comonadTest =
 applicativeTest : Test
 applicativeTest =
     describe "applicative"
-        [ test "uniformely distibuted" <|
+        [ test "uniformly distributed" <|
             \() ->
                 Zipper.map (+) simpleZipper
                     |> Zipper.andMap simpleZipper

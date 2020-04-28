@@ -60,8 +60,7 @@ import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode exposing (Value)
 
 
-{-| `NonEmpty` list is represented
-by alias on a pair of `a` and `List a`.
+{-| `NonEmpty` list is an alias for a pair of `a` and `List a`.
 
 This makes it possible to construct value of non empty List
 without relying on any specific implementation of this type.
@@ -101,12 +100,12 @@ fromList xs =
             Nothing
 
 
-{-| Cons element onto `List` to create `NoneEmpty`.
+{-| Cons element onto `List` to create `NonEmpty`.
 
     fromCons 0 [ 1, 2 ]
     --> (0, [1, 2])
 
-This function is just an alias on `Tuple.pair`
+This function is just an alias for `Tuple.pair`
 
 -}
 fromCons : a -> List a -> NonEmpty a
@@ -181,7 +180,7 @@ toList ( h, t ) =
     h :: t
 
 
-{-| Add element to the begining of `NonEmpty` list.
+{-| Add element to the beginning of `NonEmpty` list.
 
     cons 2 ( 1, [] )
     --> (2, [ 1 ])
@@ -261,7 +260,7 @@ lastHelper xs =
             lastHelper t
 
 
-{-| Take first n elements of `NonEmpty`.
+{-| Take the first n elements of `NonEmpty`.
 
     take 2 ( 1, [ 2, 3, 4 ] )
     --> ( 1, [ 2 ] )
@@ -289,7 +288,7 @@ dropHead ( _, t ) =
     fromList t
 
 
-{-| Drop first n elements of `NonEmpty` list.
+{-| Drop the first n elements of `NonEmpty` list.
 
     drop 2 ( 1, [ 2, 3, 4 ] )
     --> Just ( 3, [4] )
@@ -327,7 +326,7 @@ map f ( h, t ) =
     ( f h, List.map f t )
 
 
-{-| Some as `map` but an index is passed with each element.
+{-| Same as `map` but an index is passed with each element.
 
 Index starts at 0.
 
@@ -410,7 +409,7 @@ filter f =
     fromList << List.filter f << toList
 
 
-{-| Filter out value that resolve to `Nothing`.
+{-| Apply function to each element of `NonEmpty` and leave out values that result in `Nothing`.
 
     filterMap String.toInt ("1", ["baz", "3rd", "4"])
     --> Just (1, [4])
@@ -472,7 +471,7 @@ member a ( h, t ) =
     a == h || List.member a t
 
 
-{-| Determine if all elements satisfy some test.
+{-| Determine if all elements satisfy the test.
 
     all Char.isUpper ( 'A', [ 'B' ] )
     --> True
@@ -486,7 +485,7 @@ all f ( h, t ) =
     f h && List.all f t
 
 
-{-| Determine if any elements satisfy test.
+{-| Determine if any elements satisfies the test.
 
     any Char.isUpper ( 'a', [ 'B' ] )
     --> True
@@ -639,11 +638,11 @@ duplicateHelper acc (( _, t ) as ne) =
 
 This is a more advanced function following [`Comonad`](https://hackage.haskell.org/package/comonad)
 
-    -- for each element sum all allements till the end
+    -- for each element sum all elements till the end
     extend sum ( 1, [ 2, 3 ] )
     --> ( 6, [ 5, 3 ] )
 
-    -- calculate lenght at each point of NonEmptylist
+    -- calculate length at each point of NonEmpty list
     extend length ("foo", [ "bar", "baz", "EOF"] )
     --> ( 4, [ 3, 2, 1 ])
 
@@ -653,7 +652,7 @@ extend f =
     map f << duplicate
 
 
-{-| Places the given value between all members of the given list.
+{-| Places the given value between all members of given list.
 
     intersperse "and" ( "1", [ "2", "3" ] )
     --> ("1", ["and", "2", "and", "3"])
