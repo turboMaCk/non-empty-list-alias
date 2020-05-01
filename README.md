@@ -1,6 +1,6 @@
 # List.NonEmpty alias with Zipper
 
-[![Build Status](https://travis-ci.org/turboMaCk/nonempty-list-alias-with-zipper.svg?branch=master)](https://travis-ci.org/turboMaCk/nonempty-list-alias-with-zipper)
+[![Build Status](https://travis-ci.org/turboMaCk/non-empty-list-alias.svg?branch=master)](https://travis-ci.org/turboMaCk/non-empty-list-alias)
 
 Functions for `NonEmpty` list you already have and `Zipper` implementation that goes with it.
 
