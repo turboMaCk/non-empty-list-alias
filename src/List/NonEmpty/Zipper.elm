@@ -1,7 +1,7 @@
 module List.NonEmpty.Zipper exposing
     ( Zipper, singleton, fromNonEmpty, fromList, fromCons, fromConsList, custom
     , current, listPrev, listNext, hasPrev, hasNext, length
-    , insertBefore, insertAfter
+    , insertBefore, insertAfter, insertStart
     , consBefore, consAfter
     , next, prev, nextBy, prevBy
     , attemptNext, attemptPrev, attemptPrevBy, attemptNextBy
@@ -30,11 +30,11 @@ Functions that query `Zipper` for additional data.
 Following function inserts new value into existing `Zipper`.
 
 
-## Insert without chaining focus
+## Insert without changing focus
 
-This function insert value around focus without moving it.
+These functions insert values without moving focus.
 
-@docs insertBefore, insertAfter
+@docs insertBefore, insertAfter, insertStart
 
 
 ## Insert and change focus
@@ -282,6 +282,28 @@ insertBefore a (Zipper b f n) =
 insertAfter : a -> Zipper a -> Zipper a
 insertAfter a (Zipper b f n) =
     Zipper b f (a :: n)
+
+
+{-| Insert a new value at the start, without changing focus.
+
+Note: This is linear complexity, meaning that if the number
+of items before the current focus doubles, the time this function
+takes also doubles.
+
+    fromConsList [2, 3] (4, [5])
+    |> insertStart 1
+    |> toList
+    --> [1,2,3,4,5]
+
+    fromConsList [2, 3] (4, [5])
+    |> insertStart 1
+    |> current
+    --> 4
+
+-}
+insertStart : a -> Zipper a -> Zipper a
+insertStart a (Zipper b f n) =
+    Zipper (b ++ [ a ]) f n
 
 
 {-| Insert value before current focus and move focus to it.
