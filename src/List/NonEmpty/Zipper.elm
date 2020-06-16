@@ -1,7 +1,7 @@
 module List.NonEmpty.Zipper exposing
     ( Zipper, singleton, fromNonEmpty, fromList, fromCons, fromConsList, custom
     , current, listPrev, listNext, hasPrev, hasNext, length
-    , insertBefore, insertAfter, insertStart
+    , insertBefore, insertAfter, prepend, append
     , consBefore, consAfter
     , next, prev, nextBy, prevBy
     , attemptNext, attemptPrev, attemptPrevBy, attemptNextBy
@@ -34,7 +34,7 @@ Following function inserts new value into existing `Zipper`.
 
 These functions insert values without moving focus.
 
-@docs insertBefore, insertAfter, insertStart
+@docs insertBefore, insertAfter, prepend, append
 
 
 ## Insert and change focus
@@ -284,26 +284,48 @@ insertAfter a (Zipper b f n) =
     Zipper b f (a :: n)
 
 
-{-| Insert a new value at the start, without changing focus.
+{-| Prepend `Zipper` with a `List` of values
 
-Note: This is linear complexity, meaning that if the number
+Note: This has a linear complexity, meaning that if the number
 of items before the current focus doubles, the time this function
 takes also doubles.
 
-    fromConsList [2, 3] (4, [5])
-    |> insertStart 1
+    fromConsList [3] (4, [5])
+    |> prepend [1, 2]
     |> toList
     --> [1,2,3,4,5]
 
     fromConsList [2, 3] (4, [5])
-    |> insertStart 1
+    |> prepend [1]
     |> current
     --> 4
 
 -}
-insertStart : a -> Zipper a -> Zipper a
-insertStart a (Zipper b f n) =
-    Zipper (b ++ [ a ]) f n
+prepend : List a -> Zipper a -> Zipper a
+prepend xs (Zipper b f n) =
+    Zipper (b ++ List.reverse xs) f n
+
+
+{-| Append `Zipper` with a `List` of values
+
+Note: This has a linear complexity, meaning that if the number
+of items after the current focus doubles, the time this function
+takes also doubles.
+
+    fromConsList [1] (2, [3])
+    |> append [4, 5]
+    |> toList
+    --> [1,2,3,4,5]
+
+    fromConsList [1] (2, [3])
+    |> append [4, 5]
+    |> current
+    --> 2
+
+-}
+append : List a -> Zipper a -> Zipper a
+append xs (Zipper b f n) =
+    Zipper b f <| n ++ xs
 
 
 {-| Insert value before current focus and move focus to it.
