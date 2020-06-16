@@ -7,6 +7,7 @@ module List.NonEmpty.Zipper exposing
     , attemptNext, attemptPrev, attemptPrevBy, attemptNextBy
     , start, end
     , forward, backward, forwardBy, backwardBy
+    , focusr, focusl, focus
     , update, map, relativeIndexedMap, absoluteIndexedMap, foldl, foldr, foldl1, foldr1
     , map2, andMap
     , duplicate, extend, duplicateList
@@ -77,6 +78,13 @@ These function move in cycles around the zipper. Value on a very start is preced
 value in the end. These function simply move in circle and never reach the end of a `Zipper`.
 
 @docs forward, backward, forwardBy, backwardBy
+
+
+## Free Movement
+
+These fucntions let you shift the focus to the element which satisfy the predicate
+
+@docs focusr, focusl, focus
 
 
 # Transform
@@ -444,8 +452,8 @@ dropl (Zipper b f n) =
 
 -}
 current : Zipper a -> a
-current (Zipper _ focus _) =
-    focus
+current (Zipper _ f _) =
+    f
 
 
 {-| Get `List` of all values following current focus.
@@ -772,6 +780,99 @@ backwardBy =
     rewindByHelper backward
 
 
+{-| Move focus to the first next element that satisfy the predicate.
+
+    fromConsList [1,2] (3, [4, 5])
+    |> focusr ((==) 5)
+    |> Maybe.map current
+    --> Just 5
+
+    fromConsList [1,2] (3, [4, 5])
+    |> focusr ((==) 3)
+    |> Maybe.map current
+    --> Just 3
+
+    fromConsList [1,2] (3, [4, 5])
+    |> focusr ((==) 1)
+    |> Maybe.map current
+    --> Nothing
+
+-}
+focusr : (a -> Bool) -> Zipper a -> Maybe (Zipper a)
+focusr fc zipper =
+    if fc <| current zipper then
+        Just <| zipper
+
+    else
+        case next zipper of
+            Just z ->
+                focusr fc z
+
+            Nothing ->
+                Nothing
+
+
+{-| Move focus to the first next element that satisfy the predicate
+
+    fromConsList [1,2] (3, [4, 5])
+    |> focusl ((==) 1)
+    |> Maybe.map current
+    --> Just 1
+
+    fromConsList [1,2] (3, [4, 5])
+    |> focusl ((==) 3)
+    |> Maybe.map current
+    --> Just 3
+
+    fromConsList [1,2] (3, [4, 5])
+    |> focusl ((==) 4)
+    |> Maybe.map current
+    --> Nothing
+
+-}
+focusl : (a -> Bool) -> Zipper a -> Maybe (Zipper a)
+focusl fc zipper =
+    if fc <| current zipper then
+        Just <| zipper
+
+    else
+        case prev zipper of
+            Just z ->
+                focusl fc z
+
+            Nothing ->
+                Nothing
+
+
+{-| Focus next element by predicate. If no element satisfy predicate, try to
+select previous element. If even previous element doesn't satisfy predicate, return nothing.
+
+
+    fromConsList [1,2] (3, [4])
+    |> focus (\x -> modBy 2 x == 0)
+    |> Maybe.map current
+    --> Just 4
+
+    fromConsList [1,2] (3, [])
+    |> focus (\x -> modBy 2 x == 0)
+    |> Maybe.map current
+    --> Just 2
+
+    fromConsList [1,2] (3, [4])
+    |> focus ((==) 5)
+    --> Nothing
+
+-}
+focus : (a -> Bool) -> Zipper a -> Maybe (Zipper a)
+focus fc zipper =
+    case focusr fc zipper of
+        Nothing ->
+            focusl fc zipper
+
+        res ->
+            res
+
+
 rewindByHelper : (Zipper a -> Zipper a) -> Int -> Zipper a -> Zipper a
 rewindByHelper step n acc =
     if n < 1 then
@@ -820,8 +921,8 @@ map fc (Zipper p f n) =
 
 -}
 relativeIndexedMap : (Int -> a -> b) -> Zipper a -> Zipper b
-relativeIndexedMap f (Zipper p focus n) =
-    Zipper (List.indexedMap (\i -> f (-1 * (1 + i))) p) (f 0 focus) <|
+relativeIndexedMap f (Zipper p focus_ n) =
+    Zipper (List.indexedMap (\i -> f (-1 * (1 + i))) p) (f 0 focus_) <|
         List.indexedMap (\i -> f (i + 1)) n
 
 
@@ -834,12 +935,12 @@ relativeIndexedMap f (Zipper p focus n) =
 
 -}
 absoluteIndexedMap : (Int -> a -> b) -> Zipper a -> Zipper b
-absoluteIndexedMap f (Zipper p focus n) =
+absoluteIndexedMap f (Zipper p focus_ n) =
     let
         prevLength =
             List.length p
     in
-    Zipper (List.indexedMap (\i -> f (prevLength - 1 - i)) p) (f prevLength focus) <|
+    Zipper (List.indexedMap (\i -> f (prevLength - 1 - i)) p) (f prevLength focus_) <|
         List.indexedMap (\i -> f (prevLength + 1 + i)) n
 
 
