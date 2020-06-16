@@ -2,7 +2,8 @@ module List.NonEmpty.Zipper exposing
     ( Zipper, singleton, fromNonEmpty, fromList, fromCons, fromConsList, custom
     , current, listPrev, listNext, hasPrev, hasNext, length
     , insertBefore, insertAfter, prepend, append
-    , consBefore, consAfter, dropr, dropl
+    , consBefore, consAfter
+    , dropr, dropl, filterr, filterl, filter
     , next, prev, nextBy, prevBy
     , attemptNext, attemptPrev, attemptPrevBy, attemptNextBy
     , start, end
@@ -42,7 +43,12 @@ These functions insert values without moving focus.
 
 These functions insert value around focus while moving focus on newly inserted value.
 
-@docs consBefore, consAfter, dropr, dropl
+@docs consBefore, consAfter
+
+
+## Remove elements from Zipper
+
+@docs dropr, dropl, filterr, filterl, filter
 
 
 # Movement
@@ -438,6 +444,109 @@ dropl (Zipper b f n) =
 
         _ ->
             fromList <| List.reverse n
+
+
+{-| Filter `Zipper` while moving focus to next element
+in case the current focus doesn't satisfy the predicate.
+All elements (including previous)
+are filtered by given predicate.
+
+    fromConsList [1,2] (3, [4])
+    |> filterr (\x -> modBy 2 x == 0)
+    |> Maybe.map toList
+    --> Just [2,4]
+
+    fromConsList [1,2] (3, [4])
+    |> filterr (\x -> modBy 2 x == 0)
+    |> Maybe.map current
+    --> Just 4
+
+    fromConsList [1,2] (3, [])
+    |> filterr (\x -> modBy 2 x == 0)
+    --> Nothing
+
+-}
+filterr : (a -> Bool) -> Zipper a -> Maybe (Zipper a)
+filterr fc ((Zipper b f n) as zipper) =
+    if fc f then
+        Just <| Zipper (List.filter fc b) f (List.filter fc n)
+
+    else
+        case next zipper of
+            Just z ->
+                filterr fc z
+
+            Nothing ->
+                Nothing
+
+
+{-| Filter `Zipper` while moving focus to previous element
+in case the current focus doesn't satisfy the predicate.
+All elements (including previous)
+are filtered by given predicate.
+
+    fromConsList [1,2] (3, [4])
+    |> filterl (\x -> modBy 2 x == 0)
+    |> Maybe.map toList
+    --> Just [2,4]
+
+    fromConsList [1,2] (3, [4])
+    |> filterl (\x -> modBy 2 x == 0)
+    |> Maybe.map current
+    --> Just 2
+
+    fromConsList [1] (3, [4])
+    |> filterl (\x -> modBy 2 x == 0)
+    --> Nothing
+
+-}
+filterl : (a -> Bool) -> Zipper a -> Maybe (Zipper a)
+filterl fc ((Zipper b f n) as zipper) =
+    if fc f then
+        Just <| Zipper (List.filter fc b) f (List.filter fc n)
+
+    else
+        case prev zipper of
+            Just z ->
+                filterl fc z
+
+            Nothing ->
+                Nothing
+
+
+{-| Filter `Zipper` while moving focus to next element
+in case the current focus doesn't satisfy the predicate.
+If even that fails it tries to focus previes element which satisfies the predicate.
+If predicate fails for all the elements, Nothing is returned.
+
+    fromConsList [1,2] (3, [4])
+    |> filter (\x -> modBy 2 x == 0)
+    |> Maybe.map toList
+    --> Just [2,4]
+
+    fromConsList [1,2] (3, [4])
+    |> filter (\x -> modBy 2 x == 0)
+    |> Maybe.map current
+    --> Just 4
+
+    fromConsList [1,2] (3, [])
+    |> filter (\x -> modBy 2 x == 0)
+    |> Maybe.map current
+    --> Just 2
+
+    fromConsList [1,2] (3, [])
+    |> filter ((==) 10)
+    --> Nothing
+
+-}
+filter : (a -> Bool) -> Zipper a -> Maybe (Zipper a)
+filter fc zipper =
+    case filterr fc zipper of
+        Nothing ->
+            filterl fc zipper
+
+        res ->
+            res
 
 
 
@@ -846,7 +955,6 @@ focusl fc zipper =
 
 {-| Focus next element by predicate. If no element satisfy predicate, try to
 select previous element. If even previous element doesn't satisfy predicate, return nothing.
-
 
     fromConsList [1,2] (3, [4])
     |> focus (\x -> modBy 2 x == 0)
