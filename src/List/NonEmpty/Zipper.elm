@@ -7,7 +7,7 @@ module List.NonEmpty.Zipper exposing
     , attemptNext, attemptPrev, attemptPrevBy, attemptNextBy
     , start, end
     , forward, backward, forwardBy, backwardBy
-    , map, relativeIndexedMap, absoluteIndexedMap, foldl, foldr, foldl1, foldr1
+    , update, map, relativeIndexedMap, absoluteIndexedMap, foldl, foldr, foldl1, foldr1
     , map2, andMap
     , duplicate, extend, duplicateList
     , toNonEmpty, toList
@@ -81,7 +81,7 @@ value in the end. These function simply move in circle and never reach the end o
 
 # Transform
 
-@docs map, relativeIndexedMap, absoluteIndexedMap, foldl, foldr, foldl1, foldr1
+@docs update, map, relativeIndexedMap, absoluteIndexedMap, foldl, foldr, foldl1, foldr1
 
 
 # Combine
@@ -397,6 +397,7 @@ dropr (Zipper b f n) =
         _ ->
             fromList <| List.reverse b
 
+
 {-| Drop currently focused item. This function shift focus to previous element
 if such element exists or focuses the last one. In case of singleton `Zipper`
 this results to Nothing.
@@ -429,6 +430,7 @@ dropl (Zipper b f n) =
 
         _ ->
             fromList <| List.reverse n
+
 
 
 -- Query
@@ -777,6 +779,19 @@ rewindByHelper step n acc =
 
     else
         rewindByHelper step (n - 1) <| step acc
+
+
+{-| Update curently focused item by given function
+
+    fromConsList [1,2] (2, [3, 4])
+    |> update (\x -> x * x)
+    |> toList
+    --> [1, 2, 4, 3, 4]
+
+-}
+update : (a -> a) -> Zipper a -> Zipper a
+update fc (Zipper b f n) =
+    Zipper b (fc f) n
 
 
 
