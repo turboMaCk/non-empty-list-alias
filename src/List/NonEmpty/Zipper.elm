@@ -2,7 +2,7 @@ module List.NonEmpty.Zipper exposing
     ( Zipper, singleton, fromNonEmpty, fromList, fromCons, fromConsList, custom
     , current, listPrev, listNext, hasPrev, hasNext, length
     , insertBefore, insertAfter, prepend, append
-    , consBefore, consAfter, dropCurrent
+    , consBefore, consAfter, dropr, dropl
     , next, prev, nextBy, prevBy
     , attemptNext, attemptPrev, attemptPrevBy, attemptNextBy
     , start, end
@@ -41,7 +41,7 @@ These functions insert values without moving focus.
 
 These functions insert value around focus while moving focus on newly inserted value.
 
-@docs consBefore, consAfter, dropCurrent
+@docs consBefore, consAfter, dropr, dropl
 
 
 # Movement
@@ -364,32 +364,32 @@ consAfter a (Zipper b f n) =
     Zipper (f :: b) a n
 
 
-{-| Drop currently focus item. This function shift focus to next element
+{-| Drop currently focused item. This function shift focus to next element
 if such element exists or focuses the first one. In case of singleton Zipper
 this results to Nothing.
 
     fromConsList [1, 2] (3, [4])
-    |> dropCurrent
+    |> dropr
     |> Maybe.map toList
     --> Just [1, 2, 4]
 
     fromConsList [1, 2] (3, [4])
-    |> dropCurrent
+    |> dropr
     |> Maybe.map current
     --> Just 4
 
     fromConsList [1, 2] (3, [])
-    |> dropCurrent
+    |> dropr
     |> Maybe.map current
     --> Just 1
 
     singleton 1
-    |> dropCurrent
+    |> dropr
     --> Nothing
 
 -}
-dropCurrent : Zipper a -> Maybe (Zipper a)
-dropCurrent (Zipper b f n) =
+dropr : Zipper a -> Maybe (Zipper a)
+dropr (Zipper b f n) =
     case n of
         h :: t ->
             Just <| Zipper b h t
@@ -397,6 +397,38 @@ dropCurrent (Zipper b f n) =
         _ ->
             fromList <| List.reverse b
 
+{-| Drop currently focused item. This function shift focus to previous element
+if such element exists or focuses the last one. In case of singleton `Zipper`
+this results to Nothing.
+
+    fromConsList [1, 2] (3, [4])
+    |> dropl
+    |> Maybe.map toList
+    --> Just [1, 2, 4]
+
+    fromConsList [1, 2] (3, [4])
+    |> dropl
+    |> Maybe.map current
+    --> Just 2
+
+    fromConsList [] (1, [2, 3])
+    |> dropl
+    |> Maybe.map current
+    --> Just 3
+
+    singleton 1
+    |> dropl
+    --> Nothing
+
+-}
+dropl : Zipper a -> Maybe (Zipper a)
+dropl (Zipper b f n) =
+    case b of
+        h :: t ->
+            Just <| Zipper t h n
+
+        _ ->
+            fromList <| List.reverse n
 
 
 -- Query
