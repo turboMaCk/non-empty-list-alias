@@ -2,7 +2,7 @@ module List.NonEmpty.Zipper exposing
     ( Zipper, singleton, fromNonEmpty, fromList, fromCons, fromConsList, custom
     , current, listPrev, listNext, hasPrev, hasNext, length
     , insertBefore, insertAfter, prepend, append
-    , consBefore, consAfter
+    , consBefore, consAfter, dropCurrent
     , next, prev, nextBy, prevBy
     , attemptNext, attemptPrev, attemptPrevBy, attemptNextBy
     , start, end
@@ -41,7 +41,7 @@ These functions insert values without moving focus.
 
 These functions insert value around focus while moving focus on newly inserted value.
 
-@docs consBefore, consAfter
+@docs consBefore, consAfter, dropCurrent
 
 
 # Movement
@@ -362,6 +362,40 @@ consBefore a (Zipper b f n) =
 consAfter : a -> Zipper a -> Zipper a
 consAfter a (Zipper b f n) =
     Zipper (f :: b) a n
+
+
+{-| Drop currently focus item. This function shift focus to next element
+if such element exists or focuses the first one. In case of singleton Zipper
+this results to Nothing.
+
+    fromConsList [1, 2] (3, [4])
+    |> dropCurrent
+    |> Maybe.map toList
+    --> Just [1, 2, 4]
+
+    fromConsList [1, 2] (3, [4])
+    |> dropCurrent
+    |> Maybe.map current
+    --> Just 4
+
+    fromConsList [1, 2] (3, [])
+    |> dropCurrent
+    |> Maybe.map current
+    --> Just 1
+
+    singleton 1
+    |> dropCurrent
+    --> Nothing
+
+-}
+dropCurrent : Zipper a -> Maybe (Zipper a)
+dropCurrent (Zipper b f n) =
+    case n of
+        h :: t ->
+            Just <| Zipper b h t
+
+        _ ->
+            fromList <| List.reverse b
 
 
 
