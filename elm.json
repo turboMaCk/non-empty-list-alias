@@ -3,7 +3,7 @@
     "name": "turboMaCk/non-empty-list-alias",
     "summary": "Functions for working (a, List a) and NonEmpty List Zipper",
     "license": "BSD-3-Clause",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "exposed-modules": [
         "List.NonEmpty",
         "List.NonEmpty.Zipper"
@@ -14,8 +14,8 @@
         "elm/json": "1.1.3 <= v < 2.0.0"
     },
     "test-dependencies": {
-        "elm-explorations/test": "1.0.0 <= v < 2.0.0",
         "NoRedInk/elm-json-decode-pipeline": "1.0.0 <= v <= 2.0.0",
-        "elm-community/json-extra": "4.0.0 <= v <= 5.0.0"
+        "elm-community/json-extra": "4.0.0 <= v <= 5.0.0",
+        "elm-explorations/test": "1.0.0 <= v < 2.0.0"
     }
 }
