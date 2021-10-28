@@ -987,7 +987,7 @@ rewindByHelper step n acc =
         acc
 
     else
-        rewindByHelper step (n - 1) <| step acc
+        rewindByHelper step (n - 1) (step acc)
 
 
 {-| Update curently focused item by given function
