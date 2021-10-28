@@ -472,7 +472,12 @@ filterr fc ((Zipper b f n) as zipper) =
         Just <| Zipper (List.filter fc b) f (List.filter fc n)
 
     else
-        next zipper |> Maybe.andThen (filterr fc)
+        case next zipper of
+            Just z ->
+                filterr fc z
+
+            Nothing ->
+                Nothing
 
 
 {-| Filter `Zipper` while moving focus to previous element
@@ -501,7 +506,12 @@ filterl fc ((Zipper b f n) as zipper) =
         Just <| Zipper (List.filter fc b) f (List.filter fc n)
 
     else
-        prev zipper |> Maybe.andThen (filterl fc)
+        case prev zipper of
+            Just z ->
+                filterl fc z
+
+            Nothing ->
+                Nothing
 
 
 {-| Filter `Zipper` while moving focus to next element
@@ -727,7 +737,12 @@ byMaybeHelper step n acc =
         Just acc
 
     else
-        step acc |> Maybe.andThen (byMaybeHelper step (n - 1))
+        case step acc of
+            Just newAcc ->
+                byMaybeHelper step (n - 1) newAcc
+
+            Nothing ->
+                Nothing
 
 
 {-| Perform [`attemptNext`](#attemptNext) n times.
@@ -898,7 +913,12 @@ focusr fc zipper =
         Just <| zipper
 
     else
-        next zipper |> Maybe.andThen (focusr fc)
+        case next zipper of
+            Just z ->
+                focusr fc z
+
+            Nothing ->
+                Nothing
 
 
 {-| Move focus to the first next element that satisfy the predicate
@@ -925,7 +945,12 @@ focusl fc zipper =
         Just <| zipper
 
     else
-        prev zipper |> Maybe.andThen (focusl fc)
+        case prev zipper of
+            Just z ->
+                focusl fc z
+
+            Nothing ->
+                Nothing
 
 
 {-| Focus next element by predicate. If no element satisfy predicate, try to

@@ -328,7 +328,12 @@ dropHead ( _, t ) =
 drop : Int -> NonEmpty a -> Maybe (NonEmpty a)
 drop n ne =
     if n > 0 then
-        dropHead ne |> Maybe.andThen (drop (n - 1))
+        case dropHead ne of
+            Just new ->
+                drop (n - 1) new
+
+            Nothing ->
+                Nothing
 
     else
         Just ne
