@@ -58,7 +58,6 @@ module List.NonEmpty exposing
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode exposing (Value)
-import Maybe.Extra as Maybe
 
 
 {-| `NonEmpty` list is an alias for a pair of `a` and `List a`.
@@ -767,7 +766,7 @@ If there are any `Nothing`s, the whole function fails and returns `Nothing`.
 -}
 sequence : NonEmpty (Maybe a) -> Maybe (NonEmpty a)
 sequence ( m, ms ) =
-    Maybe.map2 fromCons m (Maybe.combine ms)
+    Maybe.map2 fromCons m (List.foldr (Maybe.map2 (::)) (Just []) ms)
 
 
 sortHelper : (List a -> List a) -> ( a, List a ) -> NonEmpty a
