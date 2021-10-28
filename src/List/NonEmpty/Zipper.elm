@@ -403,7 +403,7 @@ this results to Nothing.
 
 -}
 dropr : Zipper a -> Maybe (Zipper a)
-dropr (Zipper b f n) =
+dropr (Zipper b _ n) =
     case n of
         h :: t ->
             Just <| Zipper b h t
@@ -437,7 +437,7 @@ this results to Nothing.
 
 -}
 dropl : Zipper a -> Maybe (Zipper a)
-dropl (Zipper b f n) =
+dropl (Zipper b _ n) =
     case b of
         h :: t ->
             Just <| Zipper t h n
@@ -472,12 +472,7 @@ filterr fc ((Zipper b f n) as zipper) =
         Just <| Zipper (List.filter fc b) f (List.filter fc n)
 
     else
-        case next zipper of
-            Just z ->
-                filterr fc z
-
-            Nothing ->
-                Nothing
+        next zipper |> Maybe.andThen (filterr fc)
 
 
 {-| Filter `Zipper` while moving focus to previous element
@@ -506,12 +501,7 @@ filterl fc ((Zipper b f n) as zipper) =
         Just <| Zipper (List.filter fc b) f (List.filter fc n)
 
     else
-        case prev zipper of
-            Just z ->
-                filterl fc z
-
-            Nothing ->
-                Nothing
+        prev zipper |> Maybe.andThen (filterl fc)
 
 
 {-| Filter `Zipper` while moving focus to next element
@@ -737,12 +727,7 @@ byMaybeHelper step n acc =
         Just acc
 
     else
-        case step acc of
-            Just newAcc ->
-                byMaybeHelper step (n - 1) newAcc
-
-            Nothing ->
-                Nothing
+        step acc |> Maybe.andThen (byMaybeHelper step (n - 1))
 
 
 {-| Perform [`attemptNext`](#attemptNext) n times.
@@ -913,12 +898,7 @@ focusr fc zipper =
         Just <| zipper
 
     else
-        case next zipper of
-            Just z ->
-                focusr fc z
-
-            Nothing ->
-                Nothing
+        next zipper |> Maybe.andThen (focusr fc)
 
 
 {-| Move focus to the first next element that satisfy the predicate
@@ -945,12 +925,7 @@ focusl fc zipper =
         Just <| zipper
 
     else
-        case prev zipper of
-            Just z ->
-                focusl fc z
-
-            Nothing ->
-                Nothing
+        prev zipper |> Maybe.andThen (focusl fc)
 
 
 {-| Focus next element by predicate. If no element satisfy predicate, try to
