@@ -2,8 +2,8 @@ module List.NonEmpty exposing
     ( NonEmpty
     , singleton, cons, fromList, fromCons, unfoldl, unfoldr
     , map, indexedMap, foldl, foldl1, foldr, foldr1, filter, filterMap
-    , length, reverse, member, all, any, maximum, minimum, sum, product, last
-    , append, concat, concatMap, intersperse, map2, andMap
+    , length, reverse, member, all, any, maximum, minimum, sum, product, last, find
+    , append, concat, concatMap, intersperse, map2, andMap, sequence
     , sort, sortBy, sortWith
     , isSingleton, head, tail, take, dropHead, drop, uncons, toList
     , duplicate, extend
@@ -27,12 +27,12 @@ module List.NonEmpty exposing
 
 # Utilities
 
-@docs length, reverse, member, all, any, maximum, minimum, sum, product, last
+@docs length, reverse, member, all, any, maximum, minimum, sum, product, last, find
 
 
 # Combine
 
-@docs append, concat, concatMap, intersperse, map2, andMap
+@docs append, concat, concatMap, intersperse, map2, andMap, sequence
 
 
 # Sort
@@ -258,6 +258,36 @@ lastHelper xs =
 
         _ :: t ->
             lastHelper t
+
+
+{-| Find the first element that satisfies a predicate and return
+Just that element. If none match, return Nothing.
+
+    find (\num -> num > 5) (2, [ 4, 6, 8 ])
+    --> Just 6
+
+-}
+find : (a -> Bool) -> NonEmpty a -> Maybe a
+find predicate ( x, xs ) =
+    if predicate x then
+        Just x
+
+    else
+        findHelper predicate xs
+
+
+findHelper : (a -> Bool) -> List a -> Maybe a
+findHelper predicate list =
+    case list of
+        [] ->
+            Nothing
+
+        first :: rest ->
+            if predicate first then
+                Just first
+
+            else
+                findHelper predicate rest
 
 
 {-| Take the first n elements of `NonEmpty`.
@@ -719,6 +749,24 @@ map2 f ( h1, t1 ) ( h2, t2 ) =
 andMap : NonEmpty a -> NonEmpty (a -> b) -> NonEmpty b
 andMap =
     map2 (|>)
+
+
+{-| If every `Maybe` in the list is present, return all of the values unwrapped.
+If there are any `Nothing`s, the whole function fails and returns `Nothing`.
+
+    sequence (Just 1, [])
+    --> Just (1, [])
+
+    sequence (Just 1, [Just 2, Just 3])
+    --> Just (1, [2, 3])
+
+    sequence (Just 1,  [Nothing, Just 3])
+    --> Nothing
+
+-}
+sequence : NonEmpty (Maybe a) -> Maybe (NonEmpty a)
+sequence ( m, ms ) =
+    Maybe.map2 fromCons m (List.foldr (Maybe.map2 (::)) (Just []) ms)
 
 
 sortHelper : (List a -> List a) -> ( a, List a ) -> NonEmpty a

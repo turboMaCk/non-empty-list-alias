@@ -403,7 +403,7 @@ this results to Nothing.
 
 -}
 dropr : Zipper a -> Maybe (Zipper a)
-dropr (Zipper b f n) =
+dropr (Zipper b _ n) =
     case n of
         h :: t ->
             Just <| Zipper b h t
@@ -437,7 +437,7 @@ this results to Nothing.
 
 -}
 dropl : Zipper a -> Maybe (Zipper a)
-dropl (Zipper b f n) =
+dropl (Zipper b _ n) =
     case b of
         h :: t ->
             Just <| Zipper t h n
@@ -987,7 +987,7 @@ rewindByHelper step n acc =
         acc
 
     else
-        rewindByHelper step (n - 1) <| step acc
+        rewindByHelper step (n - 1) (step acc)
 
 
 {-| Update curently focused item by given function

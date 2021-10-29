@@ -1,6 +1,6 @@
 module ZipperTests exposing (..)
 
-import Expect exposing (Expectation)
+import Expect
 import List.NonEmpty.Zipper as Zipper exposing (Zipper)
 import Test exposing (..)
 
