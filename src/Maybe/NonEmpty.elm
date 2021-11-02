@@ -13,7 +13,7 @@ all functins in this module use `Ne` suffix to prevent collising with
 
 # Traverse
 
-@docs sequenceNe combineNe traverseNe
+@docs sequenceNe, combineNe, traverseNe
 
 -}
 
