@@ -1,4 +1,4 @@
-module Maybe.NonEmpty exposing (combineNe, sequenceNe, traverseNe)
+module Maybe.NonEmpty exposing (sequenceNe, combineNe, traverseNe)
 
 {-| Extensions to `Maybe` and `Maybe.Extra` modules
 provifing functions to work with `List.NoneEmpty.NonEmpty` type.
@@ -55,20 +55,8 @@ combineNe ( head, tail ) =
             Nothing
 
         Just v ->
-            combineNeHelp ( v, [] ) tail
+            traverseNeHelp identity ( v, [] ) tail
 
-
-combineNeHelp : NonEmpty a -> List (Maybe a) -> Maybe (NonEmpty a)
-combineNeHelp ( head, tail ) xs =
-    case xs of
-        [] ->
-            Just ( head, List.reverse tail )
-
-        (Just v) :: t ->
-            combineNeHelp ( head, v :: tail ) t
-
-        Nothing :: _ ->
-            Nothing
 
 
 {-| Like [`combineNe`](#combineNe), but map a function over each element of the list first.
@@ -86,5 +74,25 @@ If any function call fails (returns `Nothing`), `traverse` will return `Nothing`
 
 -}
 traverseNe : (a -> Maybe b) -> NonEmpty a -> Maybe (NonEmpty b)
-traverseNe f =
-    combineNe << NonEmpty.map f
+traverseNe f ( head, tail ) =
+    case f head of
+        Nothing ->
+            Nothing
+
+        Just v ->
+            traverseNeHelp f ( v, [] ) tail
+
+
+traverseNeHelp : (a -> Maybe b) -> NonEmpty b -> List a -> Maybe (NonEmpty b)
+traverseNeHelp f ( head, tail ) xs =
+    case xs of
+        [] ->
+            Just ( head, List.reverse tail )
+
+        h :: t ->
+            case f h of
+                Just v ->
+                    traverseNeHelp f ( head, v :: tail ) t
+
+                Nothing ->
+                    Nothing
