@@ -1,4 +1,4 @@
-module Maybe.NonEmpty exposing (sequenceNe, combineNe, traverseNe)
+module Maybe.NonEmpty exposing (combineNe, traverseNe)
 
 {-| Extensions to `Maybe` and `Maybe.Extra` modules
 provifing functions to work with `List.NoneEmpty.NonEmpty` type.
@@ -13,33 +13,18 @@ all functins in this module use `Ne` suffix to prevent collising with
 
 # Traverse
 
-@docs sequenceNe, combineNe, traverseNe
+@docs combineNe, traverseNe
 
 -}
 
 import List.NonEmpty as NonEmpty exposing (NonEmpty)
 
 
-{-| If every `Maybe` in the list is present, return all of the values unwrapped.
-If there are any `Nothing`s, the whole function fails and returns `Nothing`.
-
-    sequenceNe ( Just 1, [] )
-    --> Just (1, [])
-
-    sequenceNe ( Just 1, [ Just 2, Just 3 ] )
-    --> Just (1, [2, 3])
-
-    sequenceNe ( Just 1,  [ Nothing, Just 3 ] )
-    --> Nothing
-
--}
-sequenceNe : NonEmpty (Maybe a) -> Maybe (NonEmpty a)
-sequenceNe ( m, ms ) =
-    Maybe.map2 NonEmpty.fromCons m (List.foldr (Maybe.map2 (::)) (Just []) ms)
-
-
 {-| If every `Maybe` in the none emptu list is present, return all of the values unwrapped.
 If there are any `Nothing`s, the whole function fails and returns `Nothing`.
+
+    combineNe ( Just 1, [] )
+    --> Just (1, [])
 
     combineNe ( Just 1, [ Just 2, Just 3 ] )
     --> Just ( 1, [ 2, 3 ] )
@@ -56,7 +41,6 @@ combineNe ( head, tail ) =
 
         Just v ->
             traverseNeHelp identity ( v, [] ) tail
-
 
 
 {-| Like [`combineNe`](#combineNe), but map a function over each element of the list first.
