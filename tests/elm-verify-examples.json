@@ -3,6 +3,7 @@
   "tests": [
     "./README.md",
     "List.NonEmpty",
-    "List.NonEmpty.Zipper"
+    "List.NonEmpty.Zipper",
+    "Maybe.NonEmpty"
   ]
 }

@@ -750,6 +750,7 @@ andMap : NonEmpty a -> NonEmpty (a -> b) -> NonEmpty b
 andMap =
     map2 (|>)
 
+
 sortHelper : (List a -> List a) -> ( a, List a ) -> NonEmpty a
 sortHelper f ne =
     case f <| toList ne of

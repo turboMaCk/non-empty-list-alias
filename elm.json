@@ -7,7 +7,7 @@
     "exposed-modules": [
         "List.NonEmpty",
         "List.NonEmpty.Zipper",
-        "Maybe.NoneEmpty"
+        "Maybe.NonEmpty"
     ],
     "elm-version": "0.19.0 <= v < 0.20.0",
     "dependencies": {
