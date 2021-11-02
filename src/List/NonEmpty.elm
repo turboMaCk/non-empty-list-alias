@@ -3,7 +3,7 @@ module List.NonEmpty exposing
     , singleton, cons, fromList, fromCons, unfoldl, unfoldr
     , map, indexedMap, foldl, foldl1, foldr, foldr1, filter, filterMap
     , length, reverse, member, all, any, maximum, minimum, sum, product, last, find
-    , append, concat, concatMap, intersperse, map2, andMap, sequence
+    , append, concat, concatMap, intersperse, map2, andMap
     , sort, sortBy, sortWith
     , isSingleton, head, tail, take, dropHead, drop, uncons, toList
     , duplicate, extend
@@ -32,7 +32,7 @@ module List.NonEmpty exposing
 
 # Combine
 
-@docs append, concat, concatMap, intersperse, map2, andMap, sequence
+@docs append, concat, concatMap, intersperse, map2, andMap
 
 
 # Sort
@@ -749,24 +749,6 @@ map2 f ( h1, t1 ) ( h2, t2 ) =
 andMap : NonEmpty a -> NonEmpty (a -> b) -> NonEmpty b
 andMap =
     map2 (|>)
-
-
-{-| If every `Maybe` in the list is present, return all of the values unwrapped.
-If there are any `Nothing`s, the whole function fails and returns `Nothing`.
-
-    sequence (Just 1, [])
-    --> Just (1, [])
-
-    sequence (Just 1, [Just 2, Just 3])
-    --> Just (1, [2, 3])
-
-    sequence (Just 1,  [Nothing, Just 3])
-    --> Nothing
-
--}
-sequence : NonEmpty (Maybe a) -> Maybe (NonEmpty a)
-sequence ( m, ms ) =
-    Maybe.map2 fromCons m (List.foldr (Maybe.map2 (::)) (Just []) ms)
 
 
 sortHelper : (List a -> List a) -> ( a, List a ) -> NonEmpty a
