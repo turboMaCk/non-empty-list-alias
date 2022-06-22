@@ -1,7 +1,7 @@
 module List.NonEmpty exposing
     ( NonEmpty
     , singleton, cons, fromList, fromCons, unfoldl, unfoldr
-    , map, indexedMap, foldl, foldl1, foldr, foldr1, filter, filterMap
+    , map, indexedMap, foldl, foldl1, foldr, foldr1, filter, filterMap, partition
     , length, reverse, member, all, any, maximum, minimum, sum, product, last, find
     , append, concat, concatMap, intersperse, map2, andMap
     , sort, sortBy, sortWith
@@ -22,7 +22,7 @@ module List.NonEmpty exposing
 
 # Transform
 
-@docs map, indexedMap, foldl, foldl1, foldr, foldr1, filter, filterMap
+@docs map, indexedMap, foldl, foldl1, foldr, foldr1, filter, filterMap, partition
 
 
 # Utilities
@@ -895,3 +895,18 @@ decode =
 encodeList : (a -> Value) -> NonEmpty a -> Value
 encodeList f =
     Encode.list f << toList
+
+
+{-| Partition a non empty list on some test. The first list contains all values
+that satisfy the test, and the second list contains all the values that do not.
+
+    isEven : Int -> Bool
+    isEven n = (n |> modBy 2) == 0
+
+    partition isEven (0,[1,2,3,4,5])
+    --> ([0,2,4], [1,3,5])
+
+-}
+partition : (a -> Bool) -> NonEmpty a -> ( List a, List a )
+partition f =
+    List.partition f << toList

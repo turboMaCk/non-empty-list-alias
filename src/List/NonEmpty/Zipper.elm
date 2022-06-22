@@ -8,8 +8,8 @@ module List.NonEmpty.Zipper exposing
     , attemptNext, attemptPrev, attemptPrevBy, attemptNextBy
     , start, end
     , forward, backward, forwardBy, backwardBy
-    , focusr, focusl, focus
-    , update, map, relativeIndexedMap, absoluteIndexedMap, foldl, foldr, foldl1, foldr1
+    , focusr, focusl, focus, goToIndex
+    , update, map, mapAtIndex, relativeIndexedMap, absoluteIndexedMap, foldl, foldr, foldl1, foldr1
     , map2, andMap
     , duplicate, extend, duplicateList
     , toNonEmpty, toList
@@ -90,12 +90,12 @@ value in the end. These function simply move in circle and never reach the end o
 
 These fucntions let you shift the focus to the element which satisfy the predicate
 
-@docs focusr, focusl, focus
+@docs focusr, focusl, focus, goToIndex
 
 
 # Transform
 
-@docs update, map, relativeIndexedMap, absoluteIndexedMap, foldl, foldr, foldl1, foldr1
+@docs update, map, mapAtIndex, relativeIndexedMap, absoluteIndexedMap, foldl, foldr, foldl1, foldr1
 
 
 # Combine
@@ -1204,3 +1204,37 @@ duplicateList =
 genericMove : (a -> Maybe a) -> (a -> Maybe a) -> a -> Zipper a
 genericMove f g z =
     Zipper (maybeIter f [] z) z (maybeIter g [] z)
+
+
+goToIndex : Int -> Zipper a -> Maybe (Zipper a)
+goToIndex index zipper =
+    Just (start zipper)
+        |> nTimes index next
+
+
+nTimes : Int -> (a -> Maybe a) -> Maybe a -> Maybe a
+nTimes n fn value =
+    if n <= 0 then
+        value
+
+    else
+        nTimes (n - 1) fn (Maybe.andThen fn value)
+
+
+{-| Map only the element in the zipper at the given index.
+
+    custom ['A', 'B'] 'C' ['D', 'E', 'F']
+      |> mapAtIndex 1 Char.toLower
+      --> Just <| custom ['A', 'b'] 'C' ['D', 'E', 'F']
+
+-}
+mapAtIndex : Int -> (a -> a) -> Zipper a -> Maybe (Zipper a)
+mapAtIndex index fn zipper =
+    zipper
+        |> goToIndex index
+        |> Maybe.andThen
+            (\zipperAtIndex ->
+                zipperAtIndex
+                    |> update fn
+                    |> goToIndex (listPrev zipper |> List.length)
+            )
