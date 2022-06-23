@@ -1,8 +1,8 @@
 module List.NonEmpty exposing
     ( NonEmpty
     , singleton, cons, fromList, fromCons, unfoldl, unfoldr
-    , map, indexedMap, foldl, foldl1, foldr, foldr1, filter, filterMap
-    , length, reverse, member, all, any, maximum, minimum, sum, product, last, find
+    , map, indexedMap, foldl, foldl1, foldr, foldr1, filter, filterMap, partition
+    , length, reverse, member, all, any, maximum, minimum, sum, product, last, find, unique
     , append, concat, concatMap, intersperse, map2, andMap
     , sort, sortBy, sortWith
     , isSingleton, head, tail, take, dropHead, drop, uncons, toList
@@ -22,12 +22,12 @@ module List.NonEmpty exposing
 
 # Transform
 
-@docs map, indexedMap, foldl, foldl1, foldr, foldr1, filter, filterMap
+@docs map, indexedMap, foldl, foldl1, foldr, foldr1, filter, filterMap, partition
 
 
 # Utilities
 
-@docs length, reverse, member, all, any, maximum, minimum, sum, product, last, find
+@docs length, reverse, member, all, any, maximum, minimum, sum, product, last, find, unique
 
 
 # Combine
@@ -895,3 +895,56 @@ decode =
 encodeList : (a -> Value) -> NonEmpty a -> Value
 encodeList f =
     Encode.list f << toList
+
+
+{-| Partition a non empty list on some test. The first list contains all values
+that satisfy the test, and the second list contains all the values that do not.
+
+    isEven : Int -> Bool
+    isEven n = (n |> modBy 2) == 0
+
+    partition isEven (0,[1,2,3,4,5])
+    --> ([0,2,4], [1,3,5])
+
+-}
+partition : (a -> Bool) -> NonEmpty a -> ( List a, List a )
+partition f =
+    List.partition f << toList
+
+
+{-| Remove duplicates of a `NonEmpty` list.
+
+    unique (0,[1,0,1,1,0])
+    --> (0,[1])
+
+-}
+unique : NonEmpty a -> NonEmpty a
+unique xs =
+    xs
+        |> toList
+        |> uniqueHelper
+        |> fromList
+        |> Maybe.withDefault xs
+
+
+uniqueHelper : List a -> List a
+uniqueHelper list =
+    let
+        uniqueHelp : (a -> b) -> List b -> List a -> List a -> List a
+        uniqueHelp f existing remaining accumulator =
+            case remaining of
+                [] ->
+                    List.reverse accumulator
+
+                first :: rest ->
+                    let
+                        computedFirst =
+                            f first
+                    in
+                    if List.member computedFirst existing then
+                        uniqueHelp f existing rest accumulator
+
+                    else
+                        uniqueHelp f (computedFirst :: existing) rest (first :: accumulator)
+    in
+    uniqueHelp identity [] list []
