@@ -9,7 +9,7 @@ module List.NonEmpty.Zipper exposing
     , start, end
     , forward, backward, forwardBy, backwardBy
     , focusr, focusl, focus, goToIndex
-    , update, map, mapAtIndex, relativeIndexedMap, absoluteIndexedMap, foldl, foldr, foldl1, foldr1
+    , update, map, updateAtIndex, relativeIndexedMap, absoluteIndexedMap, foldl, foldr, foldl1, foldr1
     , map2, andMap
     , duplicate, extend, duplicateList
     , toNonEmpty, toList
@@ -95,7 +95,7 @@ These fucntions let you shift the focus to the element which satisfy the predica
 
 # Transform
 
-@docs update, map, mapAtIndex, relativeIndexedMap, absoluteIndexedMap, foldl, foldr, foldl1, foldr1
+@docs update, map, updateAtIndex, relativeIndexedMap, absoluteIndexedMap, foldl, foldr, foldl1, foldr1
 
 
 # Combine
@@ -1206,6 +1206,19 @@ genericMove f g z =
     Zipper (maybeIter f [] z) z (maybeIter g [] z)
 
 
+{-| Moves zipper to the given index.
+
+This function can be potentially `O(n)` operation if at the last item and trying to go to last index.
+
+    custom ['A', 'B'] 'C' ['D', 'E', 'F']
+      |> goToIndex 3
+      --> Just <| custom ['A', 'B', 'C'] 'D' ['E', 'F']
+
+    custom ['A', 'B'] 'C' ['D', 'E', 'F']
+      |> goToIndex 6
+      --> Nothing
+
+-}
 goToIndex : Int -> Zipper a -> Maybe (Zipper a)
 goToIndex index zipper =
     Just (start zipper)
@@ -1224,12 +1237,12 @@ nTimes n fn value =
 {-| Map only the element in the zipper at the given index.
 
     custom ['A', 'B'] 'C' ['D', 'E', 'F']
-      |> mapAtIndex 1 Char.toLower
+      |> updateAtIndex 1 Char.toLower
       --> Just <| custom ['A', 'b'] 'C' ['D', 'E', 'F']
 
 -}
-mapAtIndex : Int -> (a -> a) -> Zipper a -> Maybe (Zipper a)
-mapAtIndex index fn zipper =
+updateAtIndex : Int -> (a -> a) -> Zipper a -> Maybe (Zipper a)
+updateAtIndex index fn zipper =
     zipper
         |> goToIndex index
         |> Maybe.andThen
