@@ -7,7 +7,7 @@ It's safe to import this module as Maybe:
 
     import Maybe.NonEmpty as Maybe
 
-all functins in this module use `Ne` suffix to prevent collising with
+all functions in this module use `Ne` suffix to prevent collisions with
 `List` based alternatives.
 
 
@@ -20,7 +20,7 @@ all functins in this module use `Ne` suffix to prevent collising with
 import List.NonEmpty as NonEmpty exposing (NonEmpty)
 
 
-{-| If every `Maybe` in the none emptu list is present, return all of the values unwrapped.
+{-| If every `Maybe` in the none empty list is present, return all of the values unwrapped.
 If there are any `Nothing`s, the whole function fails and returns `Nothing`.
 
     combineNe ( Just 1, [] )
