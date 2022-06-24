@@ -1,7 +1,7 @@
 module Maybe.NonEmpty exposing (combineNe, traverseNe)
 
 {-| Extensions to `Maybe` and `Maybe.Extra` modules
-provifing functions to work with `List.NoneEmpty.NonEmpty` type.
+providing functions to work with `List.NoneEmpty.NonEmpty`.
 
 It's safe to import this module as Maybe:
 
