@@ -921,7 +921,7 @@ focusr fc zipper =
                 Nothing
 
 
-{-| Move focus to the first next element that satisfy the predicate
+{-| Move focus to the first previous element that satisfy the predicate
 
     fromConsList [1,2] (3, [4, 5])
     |> focusl ((==) 1)
