@@ -817,7 +817,7 @@ toEndHelper f acc =
 -- Cycling
 
 
-{-| Move focus to next value, go back to fist value if current value is last.
+{-| Move focus to next value, go back to first value if current value is last.
 
     custom [] 1 [2,3]
     |> forward
@@ -846,7 +846,7 @@ forward (Zipper p f n) =
             Zipper (f :: p) h t
 
 
-{-| Move focus to previous value, go to last value if current value is fist one.
+{-| Move focus to previous value, go to last value if current value is first one.
 
     custom [1, 2] 3 []
     |> backward
