@@ -29,7 +29,7 @@ Functions that query `Zipper` for additional data.
 
 # Insert new values
 
-Following function inserts new value into existing `Zipper`.
+The following functions insert new values into an existing `Zipper`.
 
 
 ## Insert without changing focus
@@ -41,7 +41,7 @@ These functions insert values without moving focus.
 
 ## Insert and change focus
 
-These functions insert value around focus while moving focus on newly inserted value.
+These functions insert a value around focus while moving focus on newly inserted value.
 
 @docs consBefore, consAfter
 
@@ -53,42 +53,42 @@ These functions insert value around focus while moving focus on newly inserted v
 
 # Movement
 
-Functions that move focus within `Zipper` around without losing data.
+The following functions move the focus of a `Zipper` without losing data.
 
 
 ## Bounded Movement
 
-These function will return `Nothing` when moving out of bounds of `Zipper`.
+These functions will return `Nothing` when moving out of bounds of `Zipper`.
 
 @docs next, prev, nextBy, prevBy
 
 
 ## Direction Movement
 
-These function will move in direction but won't reach out of bound.
-When end on any side is reached, the last value on this side is returned.
+These functions will move in one direction but won't end up out of bounds.
+When the end of one side is reached, the last value on that side is returned.
 
 @docs attemptNext, attemptPrev, attemptPrevBy, attemptNextBy
 
 
 ## Bounds
 
-These helper function will move from either side of a `Zipper`
+These helper functions will move from either side of a `Zipper`.
 
 @docs start, end
 
 
 ## Cycling Movement
 
-These function move in cycles around the zipper. Value on a very start is preceded by
-value in the end. These function simply move in circle and never reach the end of a `Zipper`.
+These functions move in cycles around the zipper. The value at the start is preceded by the
+value at the end. These functions simply move in circles and never reach the end of a `Zipper`.
 
 @docs forward, backward, forwardBy, backwardBy
 
 
 ## Free Movement
 
-These fucntions let you shift the focus to the element which satisfy the predicate
+These functions let you shift the focus to the element which satisfies the predicate.
 
 @docs focusr, focusl, focus, goToIndex
 
