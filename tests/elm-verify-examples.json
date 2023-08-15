@@ -4,6 +4,7 @@
     "./README.md",
     "List.NonEmpty",
     "List.NonEmpty.Zipper",
-    "Maybe.NonEmpty"
+    "Maybe.NonEmpty",
+    "Result.NonEmpty"
   ]
 }
